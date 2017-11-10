@@ -1,6 +1,11 @@
 import $ from 'jquery';
 import { remove } from 'lodash';
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import { CommandPalette } from 'ui/commandpalette';
+
 import './kbn_chrome.less';
 import { uiModules } from 'ui/modules';
 import { isSystemApiRequest } from 'ui/system_api';
@@ -34,7 +39,7 @@ export function kbnChromeProvider(chrome, internals) {
       },
 
       controllerAs: 'chrome',
-      controller($scope, $rootScope, $location, $http, Private) {
+      controller($scope, $rootScope, $location, $http, $element, Private) {
         const getUnhashableStates = Private(getUnhashableStatesProvider);
 
         // are we showing the embedded version of the chrome?
@@ -67,6 +72,13 @@ export function kbnChromeProvider(chrome, internals) {
         // and some local values
         chrome.httpActive = $http.pendingRequests;
         $scope.notifList = notify._notifs;
+
+        // console.log('$element', $element.find('#commandPaletteContainer'));
+
+        ReactDOM.render(
+          <CommandPalette />,
+          $element.find('#commandPaletteContainer')[0]
+        );
 
         return chrome;
       }
