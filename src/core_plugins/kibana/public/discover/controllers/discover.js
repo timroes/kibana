@@ -30,12 +30,20 @@ import { StateProvider } from 'ui/state_management/state';
 import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
 import { FilterManagerProvider } from 'ui/filter_manager';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
+import { registry } from 'ui/commandpalette';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
   'kibana/index_patterns'
 ]);
+
+registry.register({
+  id: 'discover-id',
+  title: 'Discover',
+  desc: 'Discover your documents',
+  icon: '/plugins/kibana/assets/app_discover.svg',
+}, '#/discover');
 
 uiRoutes
 .defaults(/discover/, {

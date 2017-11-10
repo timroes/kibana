@@ -1,0 +1,109 @@
+.commandpalette {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
+  display: block;
+  visibility: hidden;
+
+  &.commandpalette--open {
+    visibility: visible;
+  }
+  &:not(.commandpalette--open) {
+    transition: visibility 0.1s linear;
+  }
+}
+
+.commandpalette__backdrop {
+  background: rgba(0, 0, 0, 0.3);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.1s linear;
+}
+
+.commandpalette--open .commandpalette__backdrop {
+  opacity: 1;
+}
+
+.commandpalette__dialog {
+  max-width: 100%;
+  width: 400px;
+  box-shadow: 0 0 5px 1px #A0A0A0;
+  background: white;
+  border-radius: 5px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: 0 auto;
+  padding: 5px;
+  transform: translate(-50%, calc(-200px+12px));
+  opacity: 0;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+.commandpalette--open .commandpalette__dialog {
+  transform: translate(-50%, -200px);
+  opacity: 1;
+}
+
+.commandpalette__input {
+  width: 100%;
+  font-size: 1.4em;
+  background-color: white;
+  padding: 0.5em;
+  border: none;
+  font-weight: bold;
+  color: #555;
+}
+
+.commandpalette__commands {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.commandpalette__item {
+  padding: 4px 8px;
+
+  &.commandpalette__item--selected {
+    background-color: #d3f3ff;
+  }
+}
+
+.commandpalette_moreItems {
+  text-align: right;
+  color: #888;
+  padding: 4px;
+}
+
+.commandpalette__icon {
+  align-self: center;
+}
+
+.commandpalette__hotkey {
+  display: block;
+  align-self: center;
+}
+
+.commandpalette__key {
+  display: inline-block;
+  padding: 3px 5px;
+  font-size: 11px;
+  line-height: 10px;
+  color: #444d56;
+  vertical-align: middle;
+  background-color: #fafbfc;
+  border: solid 1px #c6cbd1;
+  border-bottom-color: #959da5;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #959da5;
+}

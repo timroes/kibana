@@ -8,6 +8,15 @@ import appTemplate from 'plugins/kibana/management/app.html';
 import landingTemplate from 'plugins/kibana/management/landing.html';
 import { management } from 'ui/management';
 import 'ui/kbn_top_nav';
+import { registry } from 'ui/commandpalette';
+
+// TODO: complete wrong place here...
+registry.register({
+  id: 'settings',
+  title: 'Settings',
+  desc: 'Change settings of your Kibana',
+  icon: '/plugins/kibana/assets/app_devtools.svg',
+}, '#/management/kibana/settings');
 
 uiRoutes
 .when('/management', {

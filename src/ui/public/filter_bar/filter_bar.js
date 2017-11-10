@@ -13,6 +13,8 @@ import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 import { compareFilters } from './lib/compare_filters';
 import { uiModules } from 'ui/modules';
 
+import { registry } from 'ui/commandpalette';
+
 export { disableFilter, enableFilter, toggleFilterDisabled } from './lib/disable_filter';
 
 
@@ -46,6 +48,22 @@ module.directive('filterBar', function (Private, Promise, getAppState) {
         'removeAll'
       ].forEach(function (method) {
         $scope[method] = queryFilter[method];
+      });
+
+      const addFilterCmd = registry.register({
+        id: 'add-filter',
+        title: 'Adds a filter',
+        desc: 'Filter your data for specific values',
+        icon: '/plugins/kibana/assets/action_filter.svg',
+        hotkey: { ctrl: true, shift: true, keyCode: 6, letter: 'f' }
+      }, () => {
+        $scope.$apply(() => {
+          $scope.addFilter();
+        });
+      });
+
+      $scope.$on('$destroy', () => {
+        addFilterCmd.unregister();
       });
 
       $scope.state = getAppState();
