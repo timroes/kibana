@@ -55,7 +55,7 @@ export class CommandPalette extends Component {
       ev.preventDefault();
       this.close();
     } else if (ev.keyCode === keyCodes.ENTER) {
-      const cmd = this.state.filteredCommands[this.state.selectedIndex];
+      const cmd = this.state.filteredCommands[this.state.selectedIndex + this.state.filteredCommandsOffset];
       ev.preventDefault();
       this.execute(cmd);
     } else if (ev.keyCode === keyCodes.UP) {
