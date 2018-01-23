@@ -146,16 +146,6 @@ export class UiBundlesController {
     }
   }
 
-  async ensureStyleFiles() {
-    await this.ensureDir();
-
-    for (const bundle of this._bundles) {
-      if (!await bundle.hasStyleFile()) {
-        await bundle.touchStyleFile();
-      }
-    }
-  }
-
   hashBundleEntries() {
     const hash = createHash('sha1');
     for (const bundle of this._bundles) {
