@@ -16,7 +16,6 @@ class CustomizedEditor extends Component {
     const state = this.props.state;
     state[id] = value;
     this.props.onStateChanged(state);
-    console.log(state);
   }
 
   renderControl = (control) => {

@@ -17,6 +17,8 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 const module = uiModules.get('app/visualize', ['kibana/courier']);
 
+import { waitForTemplateVis } from 'plugins/templates/vis/vis_template_types';
+
 /********
 /** Wizard Step 1
 /********/
@@ -29,6 +31,11 @@ routes.when('/visualize/step/1', {
 routes.when(VisualizeConstants.WIZARD_STEP_1_PAGE_PATH, {
   template: visualizeWizardStep1Template,
   controller: 'VisualizeWizardStep1',
+  resolve: {
+    visTypes: ()  => {
+      return waitForTemplateVis;
+    }
+  }
 });
 
 module.controller('VisualizeWizardStep1', function ($scope, $route, kbnUrl, timefilter, Private, config) {

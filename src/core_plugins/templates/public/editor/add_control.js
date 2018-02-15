@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import {
-  EuiButtonEmpty,
+  EuiButton,
   EuiContextMenuPanel,
   EuiContextMenuItem,
   EuiPopover,
@@ -44,7 +44,7 @@ class AddControl extends Component {
 
   render() {
     const triggerButton = (
-      <EuiButtonEmpty
+      <EuiButton
         size="s"
         type="text"
         iconType="arrowDown"
@@ -52,7 +52,7 @@ class AddControl extends Component {
         onClick={this.onTriggerClicked}
       >
         Add Control
-      </EuiButtonEmpty>
+      </EuiButton>
     );
 
     const items = this.props.controls.map(this.renderItem);

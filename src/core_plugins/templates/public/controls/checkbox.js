@@ -13,7 +13,7 @@ function Checkbox(props) {
       helpText={options.helpText}
     >
       <EuiSwitch
-        value={v}
+        checked={v}
         label={options.label}
         onChange={event => onValueChange(event.target.checked)}
       />

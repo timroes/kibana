@@ -129,7 +129,7 @@
     "glob-all": "3.0.1",
     "good-squeeze": "2.1.0",
     "h2o2": "5.1.1",
-    "handlebars": "4.0.5",
+    "handlebars": "^4.0.11",
     "hapi": "14.2.0",
     "hjson": "3.1.0",
     "http-proxy-agent": "1.0.0",

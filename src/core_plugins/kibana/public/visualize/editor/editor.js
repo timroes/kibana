@@ -22,23 +22,29 @@ import { KibanaParsedUrl } from 'ui/url/kibana_parsed_url';
 import { absoluteToParsedUrl } from 'ui/url/absolute_to_parsed_url';
 import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
 
+import { waitForTemplateVis } from 'plugins/templates/vis/vis_template_types';
+
 uiRoutes
   .when(VisualizeConstants.CREATE_PATH, {
     template: editorTemplate,
     resolve: {
       savedVis: function (savedVisualizations, courier, $route, Private) {
-        const visTypes = Private(VisTypesRegistryProvider);
-        const visType = _.find(visTypes, { name: $route.current.params.type });
-        const shouldHaveIndex = visType.requiresSearch && visType.options.showIndexSelection;
-        const hasIndex = $route.current.params.indexPattern || $route.current.params.savedSearchId;
-        if (shouldHaveIndex && !hasIndex) {
-          throw new Error('You must provide either an indexPattern or a savedSearchId');
-        }
+        console.log('before waitForTemplateVis');
+        return waitForTemplateVis.then(() => {
+          console.log('after waitForTemplateVis');
+          const visTypes = Private(VisTypesRegistryProvider);
+          const visType = _.find(visTypes, { name: $route.current.params.type });
+          const shouldHaveIndex = visType.requiresSearch && visType.options.showIndexSelection;
+          const hasIndex = $route.current.params.indexPattern || $route.current.params.savedSearchId;
+          if (shouldHaveIndex && !hasIndex) {
+            throw new Error('You must provide either an indexPattern or a savedSearchId');
+          }
 
-        return savedVisualizations.get($route.current.params)
-          .catch(courier.redirectWhenMissing({
-            '*': '/visualize'
-          }));
+          return savedVisualizations.get($route.current.params)
+            .catch(courier.redirectWhenMissing({
+              '*': '/visualize'
+            }));
+        });
       }
     }
   })

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { IndexedArray } from 'ui/indexed_array';
+import EventEmitter from 'events';
 const notPropsOptNames = IndexedArray.OPT_NAMES.concat('constructor', 'invokeProviders');
 
 /**
@@ -53,6 +54,7 @@ export function uiRegistry(spec) {
   const iaOpts = _.defaults(_.pick(spec, IndexedArray.OPT_NAMES), { index: ['name'] });
   const props = _.omit(spec, notPropsOptNames);
   const providers = [];
+  const listeners = new EventEmitter();
 
   /**
    * This is the Private module that will be instantiated by
@@ -86,8 +88,19 @@ export function uiRegistry(spec) {
 
   registry.register = function (privateModule) {
     providers.push(privateModule);
+    listeners.emit('change');
     return registry;
   };
+
+  registry.addChangeListener = (listener) => {
+    listeners.on('change', () => {
+      listener();
+    });
+  };
+
+  registry.removeChangeListener = (listener) => {
+    listeners.removeListener('change', listener);
+  }
 
   return registry;
 }

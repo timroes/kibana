@@ -1,0 +1,13 @@
+{
+  "vis-template": {
+    "properties": {
+      "title": {
+        "type": "keyword"
+      },
+      "config": {
+        "type": "keyword",
+        "index": false
+      }
+    }
+  }
+}
