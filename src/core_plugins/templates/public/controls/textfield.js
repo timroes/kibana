@@ -14,6 +14,7 @@ function TextField(props) {
     >
       <EuiFieldText
         value={value}
+        placeholder={options.placeholder}
         onChange={event => onChange(event.target.value)}
       />
     </EuiFormRow>
@@ -32,6 +33,11 @@ export default {
       type: 'text',
       required: true,
       default: 'Text field',
+    },
+    {
+      id: 'placeholder',
+      name: 'Placeholder',
+      type: 'text',
     },
     {
       id: 'helpText',

@@ -52,7 +52,7 @@ class SelectIndex extends Component {
       >
         <Select.Async
           className="index-pattern-react-select"
-          placeholder="Select index pattern..."
+          placeholder={options.placeholder}
           value={value}
           loadOptions={this.loadOptions}
           onChange={this.onChange}
@@ -80,11 +80,17 @@ export default {
       default: 'Select index',
     },
     {
+      id: 'placeholder',
+      name: 'Placeholder',
+      type: 'text',
+      default: 'Select index pattern...'
+    },
+    {
       id: 'helpText',
       name: 'Help Text',
       type: 'text',
       help: 'Will be shown below the text field if specified.',
-    }
+    },
   ],
   defaultValue: false,
 };
