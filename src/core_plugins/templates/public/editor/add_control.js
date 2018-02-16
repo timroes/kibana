@@ -65,7 +65,10 @@ class AddControl extends Component {
         anchorPosition="upLeft"
         panelPaddingSize="none"
       >
-        <EuiContextMenuPanel items={items} />
+        <EuiContextMenuPanel
+          items={items}
+          style={{ width: '200px' }}
+        />
       </EuiPopover>
     );
   }

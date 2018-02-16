@@ -6,7 +6,7 @@ import {
 } from '@elastic/eui';
 
 function Checkbox(props) {
-  const { options, value, onValueChange } = props;
+  const { options, value, onChange } = props;
   return (
     <EuiFormRow
       helpText={options.helpText}
@@ -14,7 +14,7 @@ function Checkbox(props) {
       <EuiSwitch
         checked={value}
         label={options.label}
-        onChange={event => onValueChange(event.target.checked)}
+        onChange={event => onChange(event.target.checked)}
       />
     </EuiFormRow>
   );

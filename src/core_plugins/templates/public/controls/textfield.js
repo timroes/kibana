@@ -6,7 +6,7 @@ import {
 } from '@elastic/eui';
 
 function TextField(props) {
-  const { options, value, onValueChange } = props;
+  const { options, value, onChange } = props;
   return (
     <EuiFormRow
       label={options.label}
@@ -14,7 +14,7 @@ function TextField(props) {
     >
       <EuiFieldText
         value={value}
-        onChange={event => onValueChange(event.target.value)}
+        onChange={event => onChange(event.target.value)}
       />
     </EuiFormRow>
   );

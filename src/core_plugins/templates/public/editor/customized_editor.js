@@ -32,9 +32,10 @@ class CustomizedEditor extends Component {
       >
         <Control.component
           key={control.id}
+          id={control.id}
           options={options}
           value={value}
-          onValueChange={val => this.updateValue(control.id, val)}
+          onChange={val => this.updateValue(control.id, val)}
         />
         { this.props.enableControlEditing &&
           <div className="control-item__actions">
