@@ -66,7 +66,11 @@ class CustomizedEditor extends Component {
 
 CustomizedEditor.propTypes = {
   controls: PropTypes.array,
+  state: PropTypes.object.isRequired,
   enableControlEditing: PropTypes.bool.isRequired,
+  onStateChanged: PropTypes.func.isRequired,
+  onEditControl: PropTypes.func,
+  onDeleteControl: PropTypes.func,
 };
 
 CustomizedEditor.defaultProps = {
