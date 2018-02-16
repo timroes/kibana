@@ -70,7 +70,7 @@ class ControlEditor extends Component {
     return (
       <EuiFormRow
         label="Variable name"
-        helpText="You can access that value via {{varName}} in the template."
+        helpText="You can access the value of this field via {{varName}} in the template."
       >
         <EuiFieldText
           value={this.state.action.varName}
