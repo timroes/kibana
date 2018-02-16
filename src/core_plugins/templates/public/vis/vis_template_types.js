@@ -2,6 +2,7 @@ import { VisFactoryProvider } from 'ui/vis/vis_factory';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { CATEGORY } from 'ui/vis/vis_category';
 import { SavedObjectsClient } from 'ui/saved_objects';
+import uiRoutes from 'ui/routes';
 
 import chrome from 'ui/chrome';
 
@@ -25,18 +26,18 @@ const waitForTemplateVis = new Promise(resolve => {
       templates.savedObjects.forEach(template => {
         console.log(`Create vis type for`, template);
 
-        VisTypesRegistryProvider.register(Private => {
+        VisTypesRegistryProvider.register((Private, $injector) => {
           const VisFactory = Private(VisFactoryProvider);
           return VisFactory.createReactVisualization({
             name: `vis-template-${template.id}`,
-            templateId: template.id,
             templateConfig: JSON.parse(template.attributes.config),
             title: template.attributes.title,
             description: 'A custom created visualization.',
             category: CATEGORY.OTHER,
             image,
             visConfig: {
-              component: TemplateVis
+              component: TemplateVis,
+              savedVis: () => $injector.get('SavedVis'),
             },
             editorConfig: {
               optionsTemplate: TemplateVisEditor,
@@ -44,17 +45,16 @@ const waitForTemplateVis = new Promise(resolve => {
             },
             requestHandler: 'none',
             responseHandler: 'none',
-            // options: {
-            //   showQueryBar: false,
-            //   showFilterBar: false,
-            //   showIndexSelection: false
-            // },
           });
         });
       });
       resolve();
     });
   });
+});
+
+uiRoutes.addSetupWork(() => {
+  return waitForTemplateVis;
 });
 
 export { waitForTemplateVis };
