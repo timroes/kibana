@@ -51,8 +51,6 @@ class ControlEditor extends Component {
 
   renderOption = (option) => {
     const Input = Inputs[option.type];
-    console.log(option);
-    console.log(this.state.controlOptions);
     const value = this.state.controlOptions[option.id] === undefined ?
       option.default : this.state.controlOptions[option.id];
     return (
