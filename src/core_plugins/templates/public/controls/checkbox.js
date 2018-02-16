@@ -7,13 +7,12 @@ import {
 
 function Checkbox(props) {
   const { options, value, onValueChange } = props;
-  const v = value !== undefined ? value : options.defautValue;
   return (
     <EuiFormRow
       helpText={options.helpText}
     >
       <EuiSwitch
-        checked={v}
+        checked={value}
         label={options.label}
         onChange={event => onValueChange(event.target.checked)}
       />
