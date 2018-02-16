@@ -7,18 +7,17 @@ import chrome from 'ui/chrome';
 import 'ui/autoload/styles';
 import 'ui/autoload/all';
 
-import { TemplateApp } from './app/template_app';
+import { TemplateEditor } from '../editor/editor_component';
+import './template_app.less';
 
-chrome.setRootTemplate('<div id="templateEditor"></div>');
-
-// const store = configureStore();
-// const history = createHistory();
+chrome.setRootTemplate('<div id="templateEditor" class="template-editor"></div>');
 
 // TODO: For sure not the best way to wait for chrome
 uiModules.get('kibana').run(($injector) => {
   setTimeout(() => {
+    const $http = $injector.get('$http');
     ReactDOM.render(
-      <TemplateApp injector={$injector}/>,
+      <TemplateEditor $http={$http}/>,
       document.getElementById('templateEditor')
     );
   });

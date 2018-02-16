@@ -1,21 +1,23 @@
 import React, { Component } from 'react';
 
+import './template_editor.less';
+
 import {
-  EuiButton,
+  EuiButtonEmpty,
   EuiCodeBlock,
-  EuiCodeEditor,
   EuiPage,
   EuiPageContentBody,
   EuiPageBody,
   EuiPageHeader,
   EuiPageSideBar,
-  EuiFieldText,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiTitle,
 } from '@elastic/eui';
 
 import 'brace/mode/hjson';
 
+import { toastNotifications } from 'ui/notify';
 import { SavedObjectsClient } from 'ui/saved_objects';
 
 import { Controls } from '../controls';
@@ -23,18 +25,24 @@ import { Controls } from '../controls';
 import { AddControl } from './add_control';
 import { CustomizedEditor } from './customized_editor';
 import { ControlEditor } from './control_editor';
+import { PipelineEditor } from './pipeline_editor';
+import { TitleEditor } from './dialogs';
 
 import { TemplateCompiler } from '../utils/compiler';
 
 class TemplateEditor extends Component {
+
+  savedObjId = null;
 
   totalFieldCount = 1;
 
   state = {
     controls: [],
     state: {},
-    templateName: '',
+    templateName: 'Untitled Template',
     template: '',
+    showEditor: false,
+    showTemplateNameEditor: false,
   };
 
   constructor(props) {
@@ -108,90 +116,126 @@ class TemplateEditor extends Component {
     this.setState({ template });
   }
 
-  onChangeTemplateName = (event) => {
-    this.setState({
-      templateName: event.target.value
-    });
+  onChangeTemplateName = (templateName) => {
+    this.setState({ templateName });
+  };
+
+  toggleShowEditor = () => {
+    this.setState(state => ({
+      showEditor: !state.showEditor
+    }));
+  };
+
+  saveTemplate = (args) => {
+    console.log('save template', args);
   };
 
   onSaveTemplate = () => {
-    console.log('save template');
     // TODO: current state as default state?
-    this._savedObjectsClient.create('vis-template', {
+    const attributes = {
       title: this.state.templateName,
       config: JSON.stringify({
         controls: this.state.controls,
         template: this.state.template,
       }),
+    };
+    const saving = this.savedObjId ?
+      this._savedObjectsClient.update('vis-template', this.savedObjId, attributes) :
+      this._savedObjectsClient.create('vis-template', attributes);
+
+    saving.then((obj) => {
+      this.savedObjId = obj.id;
+      toastNotifications.addSuccess('The template was saved.');
     });
   };
 
   render() {
     return (
-      <EuiPage>
-        <EuiPageHeader>
-          <EuiFlexGroup alignItems="center">
+      <React.Fragment>
+        <EuiPage>
+          <EuiPageHeader>
+            <EuiFlexGroup gutterSize="s">
+              <EuiFlexItem grow={false}>
+                <EuiTitle className="template-app__title">
+                  <h1>
+                    {this.state.templateName}
+                  </h1>
+                </EuiTitle>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <TitleEditor
+                  value={this.state.templateName}
+                  onChange={this.onChangeTemplateName}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiPageHeader>
+          <EuiPageBody>
+            <EuiPageSideBar style={{ minWidth: '300px' }}>
+              <CustomizedEditor
+                controls={this.state.controls}
+                state={this.state.state}
+                onStateChanged={this.onStateChanged}
+                enableControlEditing={true}
+                onDeleteControl={this.onDeleteControl}
+                onEditControl={this.onEditControl}
+              />
+
+              { this.state.editControl &&
+                <ControlEditor
+                  control={Controls[this.state.editControl.controlId]}
+                  action={this.state.editControl.action}
+                  controlOptions={this.state.editControl.options}
+                  onCancel={this.cancelEditControl}
+                  onSave={this.saveEditControl}
+                />
+              }
+            </EuiPageSideBar>
+            <EuiPageContentBody className="template-app__content">
+              TODO: Render vis here
+              <EuiCodeBlock
+                language="hjson"
+              >
+                {this.state.compiledTemplate}
+              </EuiCodeBlock>
+            </EuiPageContentBody>
+          </EuiPageBody>
+        </EuiPage>
+        <div className="bottom-bar">
+          { this.state.showEditor &&
+            <PipelineEditor
+              value={this.state.template}
+              onChange={this.updateTemplateString}
+            />
+          }
+          <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <AddControl
                 controls={Object.values(Controls)}
                 onAddControl={this.onAddControl}
               />
             </EuiFlexItem>
-            <EuiFlexItem grow={true}>
-              <EuiFieldText
-                placeholder="Template name"
-                value={this.state.templateName}
-                onChange={this.onChangeTemplateName}
-              />
-            </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButton
-                fill
-                color="primary"
+              <EuiButtonEmpty
+                iconType="console"
+                color="ghost"
+                onClick={this.toggleShowEditor}
+              >
+                Pipeline template
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            <EuiFlexItem grow={true}/>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                color="ghost"
                 onClick={this.onSaveTemplate}
               >
                 Save
-              </EuiButton>
+              </EuiButtonEmpty>
             </EuiFlexItem>
           </EuiFlexGroup>
-        </EuiPageHeader>
-        <EuiPageBody>
-          <EuiPageSideBar style={{ minWidth: '300px' }}>
-            <CustomizedEditor
-              controls={this.state.controls}
-              state={this.state.state}
-              onStateChanged={this.onStateChanged}
-              enableControlEditing={true}
-              onDeleteControl={this.onDeleteControl}
-              onEditControl={this.onEditControl}
-            />
-
-            { this.state.editControl &&
-              <ControlEditor
-                control={Controls[this.state.editControl.controlId]}
-                action={this.state.editControl.action}
-                controlOptions={this.state.editControl.options}
-                onCancel={this.cancelEditControl}
-                onSave={this.saveEditControl}
-              />
-            }
-          </EuiPageSideBar>
-          <EuiPageContentBody className="template-app__content">
-            <EuiCodeEditor
-              mode="hjson"
-              height="250px"
-              width="100%"
-              value={this.state.template}
-              onChange={this.updateTemplateString}
-            />
-            <EuiCodeBlock
-              language="hjson"
-            >
-              {this.state.compiledTemplate}
-            </EuiCodeBlock>
-          </EuiPageContentBody>
-        </EuiPageBody>
-      </EuiPage>
+        </div>
+      </React.Fragment>
     );
   }
 }

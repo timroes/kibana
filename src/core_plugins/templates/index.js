@@ -9,7 +9,7 @@ export default function (kibana) {
         order: -1000,
         description: 'Time series expressions for everything',
         icon: 'plugins/templates/app/app_icon.svg',
-        main: 'plugins/templates/app',
+        main: 'plugins/templates/app/app',
       },
       mappings,
       visTypes: ['plugins/templates/vis/vis_template_types'],

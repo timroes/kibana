@@ -23,7 +23,7 @@ function Checkbox(props) {
 
 export default {
   id: 'checkbox',
-  name: 'Checkbox',
+  name: 'Switch',
   icon: 'check',
   component: Checkbox,
   options: [
@@ -32,7 +32,7 @@ export default {
       name: 'Label',
       type: 'text',
       required: true,
-      default: 'On or off',
+      default: 'Switch',
     },
     {
       id: 'helpText',

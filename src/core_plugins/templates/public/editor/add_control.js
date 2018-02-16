@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import {
-  EuiButton,
+  EuiButtonEmpty,
   EuiContextMenuPanel,
   EuiContextMenuItem,
   EuiPopover,
@@ -44,15 +44,14 @@ class AddControl extends Component {
 
   render() {
     const triggerButton = (
-      <EuiButton
-        size="s"
+      <EuiButtonEmpty
+        color="ghost"
         type="text"
-        iconType="arrowDown"
-        iconSide="right"
+        iconType="controlsVertical"
         onClick={this.onTriggerClicked}
       >
         Add Control
-      </EuiButton>
+      </EuiButtonEmpty>
     );
 
     const items = this.props.controls.map(this.renderItem);
@@ -63,7 +62,7 @@ class AddControl extends Component {
         button={triggerButton}
         isOpen={this.state.isPopoverOpen}
         closePopover={this.closePopover}
-        anchorPosition="downLeft"
+        anchorPosition="upLeft"
         panelPaddingSize="none"
       >
         <EuiContextMenuPanel items={items} />
