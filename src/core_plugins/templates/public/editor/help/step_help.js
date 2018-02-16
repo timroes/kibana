@@ -19,7 +19,7 @@ const helpSteps = [
     title: 'Assign fields to variables',
     children: (
       <EuiText>
-        Use the <EuiCode>varName</EuiCode> setting for each field to assign its
+        Use the <EuiCode>Variable name</EuiCode> setting for each field to assign its
         value to a variable.
       </EuiText>
     )
