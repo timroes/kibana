@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import './template_editor.less';
 
 import {
+  EuiButton,
   EuiButtonEmpty,
   EuiCodeBlock,
   EuiPage,
@@ -27,6 +28,7 @@ import { CustomizedEditor } from './customized_editor';
 import { ControlEditor } from './control_editor';
 import { PipelineEditor } from './pipeline_editor';
 import { TitleEditor } from './dialogs';
+import { StepHelp } from './help/step_help';
 
 import { TemplateCompiler } from '../utils/compiler';
 
@@ -149,7 +151,51 @@ class TemplateEditor extends Component {
     });
   };
 
+  renderEditorBody() {
+    return (
+      <React.Fragment>
+        <EuiPageSideBar style={{ minWidth: '300px' }}>
+          <CustomizedEditor
+            controls={this.state.controls}
+            state={this.state.state}
+            onStateChanged={this.onStateChanged}
+            enableControlEditing={true}
+            onDeleteControl={this.onDeleteControl}
+            onEditControl={this.onEditControl}
+          />
+
+          { this.state.editControl &&
+            <ControlEditor
+              control={Controls[this.state.editControl.controlId]}
+              action={this.state.editControl.action}
+              controlOptions={this.state.editControl.options}
+              onCancel={this.cancelEditControl}
+              onSave={this.saveEditControl}
+            />
+          }
+        </EuiPageSideBar>
+        <EuiPageContentBody className="template-app__content">
+          TODO: Render vis here
+          <EuiCodeBlock
+            language="hjson"
+          >
+            {this.state.compiledTemplate}
+          </EuiCodeBlock>
+        </EuiPageContentBody>
+      </React.Fragment>
+    );
+  }
+
+  renderEmptyState() {
+    return (
+      <div className="template-editor__empty">
+        <StepHelp />
+      </div>
+    );
+  }
+
   render() {
+    const showEmptyState = !this.state.template && this.state.controls.length === 0;
     return (
       <React.Fragment>
         <EuiPage>
@@ -171,34 +217,7 @@ class TemplateEditor extends Component {
             </EuiFlexGroup>
           </EuiPageHeader>
           <EuiPageBody>
-            <EuiPageSideBar style={{ minWidth: '300px' }}>
-              <CustomizedEditor
-                controls={this.state.controls}
-                state={this.state.state}
-                onStateChanged={this.onStateChanged}
-                enableControlEditing={true}
-                onDeleteControl={this.onDeleteControl}
-                onEditControl={this.onEditControl}
-              />
-
-              { this.state.editControl &&
-                <ControlEditor
-                  control={Controls[this.state.editControl.controlId]}
-                  action={this.state.editControl.action}
-                  controlOptions={this.state.editControl.options}
-                  onCancel={this.cancelEditControl}
-                  onSave={this.saveEditControl}
-                />
-              }
-            </EuiPageSideBar>
-            <EuiPageContentBody className="template-app__content">
-              TODO: Render vis here
-              <EuiCodeBlock
-                language="hjson"
-              >
-                {this.state.compiledTemplate}
-              </EuiCodeBlock>
-            </EuiPageContentBody>
+            { showEmptyState ? this.renderEmptyState() : this.renderEditorBody() }
           </EuiPageBody>
         </EuiPage>
         <div className="bottom-bar">
@@ -226,12 +245,12 @@ class TemplateEditor extends Component {
             </EuiFlexItem>
             <EuiFlexItem grow={true}/>
             <EuiFlexItem grow={false}>
-              <EuiButtonEmpty
+              <EuiButton
                 color="ghost"
                 onClick={this.onSaveTemplate}
               >
                 Save
-              </EuiButtonEmpty>
+              </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>
         </div>
