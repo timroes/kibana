@@ -10,6 +10,10 @@ export default function (kibana) {
         description: 'Time series expressions for everything',
         icon: 'plugins/templates/app/app_icon.svg',
         main: 'plugins/templates/app/app',
+        uses: [
+          'fieldFormats',
+          'savedObjectTypes'
+        ]
       },
       mappings,
       visTypes: ['plugins/templates/vis/vis_template_types'],

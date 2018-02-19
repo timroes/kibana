@@ -5,4 +5,13 @@ function getDefaultOptions(control) {
   }, {});
 }
 
-export { getDefaultOptions };
+function getControlDisplayName(control, controlOptions) {
+  const options = {
+    ...getDefaultOptions(control),
+    ...controlOptions
+  };
+  console.log(options);
+  return options.label || control.name;
+}
+
+export { getDefaultOptions, getControlDisplayName };

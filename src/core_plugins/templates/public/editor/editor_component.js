@@ -167,6 +167,7 @@ class TemplateEditor extends Component {
           { this.state.editControl &&
             <ControlEditor
               control={Controls[this.state.editControl.controlId]}
+              controls={this.state.controls}
               action={this.state.editControl.action}
               controlOptions={this.state.editControl.options}
               onCancel={this.cancelEditControl}

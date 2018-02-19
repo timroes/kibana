@@ -60,6 +60,7 @@ class ControlEditor extends Component {
         config={option}
         value={value}
         onChange={this.onChangeInput}
+        controls={this.props.controls}
       />
     );
   }
@@ -119,6 +120,7 @@ class ControlEditor extends Component {
 
 ControlEditor.propTypes = {
   control: PropTypes.object.isRequired,
+  controls: PropTypes.array.isRequired,
   controlOptions: PropTypes.object.isRequired,
   onCancel: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
