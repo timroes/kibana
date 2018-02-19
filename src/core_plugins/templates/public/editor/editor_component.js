@@ -27,7 +27,7 @@ import { AddControl } from './add_control';
 import { CustomizedEditor } from './customized_editor';
 import { ControlEditor } from './control_editor';
 import { PipelineEditor } from './pipeline_editor';
-import { TitleEditor } from './dialogs';
+import { LoadDialog, TitleEditor } from './dialogs';
 import { StepHelp } from './help/step_help';
 
 import { TemplateCompiler } from '../utils/compiler';
@@ -151,6 +151,30 @@ class TemplateEditor extends Component {
     });
   };
 
+  loadSavedTemplates = (query) => {
+    return this._savedObjectsClient.find({
+      type: 'vis-template',
+      search: `${query}*`,
+    }).then(result => {
+      return result.savedObjects.map(obj => ({
+        title: obj.attributes.title,
+        value: obj,
+      }));
+    });
+  };
+
+  onLoadTemplate = (savedObj) => {
+    console.log('load template', savedObj);
+    const { controls, template } = JSON.parse(savedObj.attributes.config);
+    this.setState({
+      controls,
+      template,
+      templateName: savedObj.attributes.title,
+      state: {},
+    });
+    this.savedObjId = savedObj.id;
+  };
+
   renderEditorBody() {
     return (
       <React.Fragment>
@@ -245,6 +269,13 @@ class TemplateEditor extends Component {
               </EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={true}/>
+            <EuiFlexItem grow={false}>
+              <LoadDialog
+                button={<EuiButtonEmpty color="ghost">Load</EuiButtonEmpty>}
+                loadEntries={this.loadSavedTemplates}
+                onLoad={this.onLoadTemplate}
+              />
+            </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiButton
                 color="ghost"

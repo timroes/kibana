@@ -12,11 +12,8 @@ import { TemplateVis } from './template_vis';
 import { TemplateVisEditor } from './template_vis_editor';
 
 const waitForTemplateVis = new Promise(resolve => {
-  // TODO: DANGER!!!
   chrome.dangerouslyGetActiveInjector().then(($injector) => {
     const $http = $injector.get('$http');
-    console.log('Dangerously got stuff');
-
     const savedObjects = new SavedObjectsClient({ $http });
 
     savedObjects.find({
@@ -24,8 +21,6 @@ const waitForTemplateVis = new Promise(resolve => {
       perPage: 10000,
     }).then(templates => {
       templates.savedObjects.forEach(template => {
-        console.log(`Create vis type for`, template);
-
         VisTypesRegistryProvider.register((Private, $injector) => {
           const VisFactory = Private(VisFactoryProvider);
           return VisFactory.createReactVisualization({
