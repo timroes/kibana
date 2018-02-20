@@ -13,6 +13,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiTitle,
+  htmlIdGenerator,
 } from '@elastic/eui';
 
 import 'brace/mode/hjson';
@@ -37,7 +38,7 @@ class TemplateEditor extends Component {
 
   savedObjId = null;
 
-  totalFieldCount = 1;
+  fieldIdGenerator = htmlIdGenerator();
 
   state = {
     controls: [],
@@ -62,7 +63,7 @@ class TemplateEditor extends Component {
     const controls = [...this.state.controls];
     controls.push({
       // TODO: calculate a proper id, that will stay stable
-      id: `field${this.totalFieldCount++}`,
+      id: `field${this.fieldIdGenerator()}`,
       controlId: control.id,
       options: {},
       action: { varName: '' },
@@ -161,7 +162,6 @@ class TemplateEditor extends Component {
   };
 
   onLoadTemplate = (savedObj) => {
-    console.log('load template', savedObj);
     const { controls, template } = JSON.parse(savedObj.attributes.config);
     this.setState({
       controls,
