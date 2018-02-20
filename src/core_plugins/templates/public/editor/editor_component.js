@@ -5,7 +5,6 @@ import './template_editor.less';
 import {
   EuiButton,
   EuiButtonEmpty,
-  EuiCodeBlock,
   EuiPage,
   EuiPageContentBody,
   EuiPageBody,
@@ -29,6 +28,8 @@ import { ControlEditor } from './control_editor';
 import { PipelineEditor } from './pipeline_editor';
 import { LoadDialog, TitleEditor } from './dialogs';
 import { StepHelp } from './help/step_help';
+
+import { renderIntoElement } from '../utils/render';
 
 import { TemplateCompiler } from '../utils/compiler';
 
@@ -104,7 +105,7 @@ class TemplateEditor extends Component {
 
   compileTemplate(controls, template, state) {
     this._compiler.compile(template, controls, state).then(compiledTemplate => {
-      this.setState({ compiledTemplate });
+      renderIntoElement(this.container, compiledTemplate);
     });
   }
 
@@ -126,10 +127,6 @@ class TemplateEditor extends Component {
     this.setState(state => ({
       showEditor: !state.showEditor
     }));
-  };
-
-  saveTemplate = (args) => {
-    console.log('save template', args);
   };
 
   onSaveTemplate = () => {
@@ -200,12 +197,7 @@ class TemplateEditor extends Component {
           }
         </EuiPageSideBar>
         <EuiPageContentBody className="template-app__content">
-          TODO: Render vis here
-          <EuiCodeBlock
-            language="hjson"
-          >
-            {this.state.compiledTemplate}
-          </EuiCodeBlock>
+          <div className="template-editor__preview" ref={el => this.container = el}/>
         </EuiPageContentBody>
       </React.Fragment>
     );

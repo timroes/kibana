@@ -11,9 +11,17 @@ export default function (kibana) {
         icon: 'plugins/templates/app/app_icon.svg',
         main: 'plugins/templates/app/app',
         uses: [
+          'visTypes',
+          'visResponseHandlers',
+          'visRequestHandlers',
+          'visEditorTypes',
+          'savedObjectTypes',
+          'spyModes',
           'fieldFormats',
-          'savedObjectTypes'
-        ]
+        ],
+        injectVars: (server) => {
+          return server.plugins.kibana.injectVars(server);
+        },
       },
       mappings,
       visTypes: ['plugins/templates/vis/vis_template_types'],
