@@ -104,7 +104,6 @@ module.exports = function (grunt) {
       flags: [
         ...funcTestServerFlags,
         '--dev',
-        '--dev_mode.enabled=false',
         '--no-base-path',
         '--optimize.watchPort=5611',
         '--optimize.watchPrebuild=true',

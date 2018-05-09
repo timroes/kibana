@@ -21,6 +21,7 @@ export {
   embeddableFactories,
   fieldFormats,
   fieldFormatEditors,
+  inspectorViews,
   spyModes,
   chromeNavControls,
   navbarExtensions,

@@ -49,6 +49,10 @@ uiModules
           return Boolean(requiresSearch && isZeroHits && shouldShowMessage);
         };
 
+        $scope.openInspector = (vis) => {
+          vis.openInspector().bindToAngularScope($scope);
+        };
+
         $scope.visElement = getVisContainer();
 
         const loadingDelay = config.get('visualization:loadingDelay');
