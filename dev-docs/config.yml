@@ -1,7 +1,16 @@
 contents:
-  - title: 'Visualizations'
+  - title: 'Inspector'
     contents:
-      - title: Embed visualizations
-        page: src/ui/public/inspector/README.md
-      - title: Use loader
-        jsdoc: visualize.loader
+      - title: Extend Inspector
+        page: src/ui/public/visualize/loader/loader-examples.md
+        id: extend-inspector
+      - title: Use Inspector
+        page: src/ui/public/visualize/loader/loader-usage.md
+        id: use-inspector
+      - title: Inspector JS API
+        id: inspector-api
+        jsdoc: src/ui/public/visualize/loader/**/*
+      - title: Inspector API
+        stage: beta
+        id: inspector-server-api
+        swagger: src/ui/public/visualize/loader/inspector-api.yml

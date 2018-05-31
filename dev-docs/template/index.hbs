@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/eui_theme_light.css">
+  <style type="text/css">
+    html, body {
+      height: 100%;
+    }
+    body {
+      display: flex;
+      align-items: stretch;
+      margin: 0;
+      padding: 0 !important;
+    }
+    main {
+      background-color: white;
+      flex: 1 1 auto;
+      padding: 16px;
+    }
+    .sidenav {
+      padding: 16px;
+      margin-right: 0;
+      max-width: 400px;
+      border-right: 1px solid #D9D9D9;
+      flex: 0 0 auto;
+    }
+    .sidenav__header {
+      border-bottom: 1px solid #D9D9D9;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+    }
+    .euiPageBody {
+      flex: 1 1 auto;
+    }
+  </style>
+  <link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+</head>
+<body class="euiPage">
+  <div class="euiPageBody">
+    <nav class="sidenav euiSideNav euiPageSideBar">
+      <header class="sidenav__header">
+        <img height="60px" src="https://www.elastic.co/assets/bltf11265439e44d327/logo-elastic-kibana-lt.svg">
+        <h1 class="euiTitle euiTitle--xsmall">Developer Documentation</h1>
+      </header>
+      <div class="euiSideNav__content">
+        {{#each toc}}
+          <div class="euiSideNavItem euiSideNavItem--root euiSideNavItem--hasChildItems">
+            <div class="euiSideNavItemButton">
+              <span class="euiSideNavItemButton__content">
+                <span class="euiSideNavItemButton__label">{{this.title}}</span>
+              </span>
+            </div>
+            <ul>
+              {{#each this.contents}}
+                <li class="euiSideNavItem euiSideNavItem--trunk">
+                  <a href="{{this.slug}}" class="euiSideNavItemButton euiSideNavItemButton--isClickable">
+                    <span class="euiSideNavItemButton__content">
+                      <span class="euiSideNavItemButton__label">
+                        {{#if this.isBeta}}
+                        <span class="euiBadge euiBadge--danger">
+                          <span class="euiBadge__content">
+                            <span class="euiBadge__text">Beta</span>
+                          </span>
+                        </span>
+                        {{/if}}
+                        {{this.title}}
+                      </span>
+                      {{#if this.jsdoc}}
+                        <span class="euiBadge euiBadge--primary">
+                          <span class="euiBadge__content">
+                            <span class="euiBadge__text">JS</span>
+                          </span>
+                        </span>
+                      {{/if}}
+                      {{#if this.swagger}}
+                        <span class="euiBadge euiBadge--accent">
+                          <span class="euiBadge__content">
+                            <span class="euiBadge__text">API</span>
+                          </span>
+                        </span>
+                      {{/if}}
+                    </span>
+                  </a>
+                </li>
+              {{/each}}
+            </ul>
+          </div>
+        {{/each}}
+      </div>
+    </nav>
+
+    <main class="euiText">
+      <h1>{{title}}</h1>
+      {{#if this.isBeta}}
+        <div class="euiCallOut euiCallOut--warning">
+          <div class="euiCallOutHeader">
+            <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><path id="bolt-a" d="M7.54 13.773a.5.5 0 0 0 .891.454l3.015-5.931A.5.5 0 0 0 11 7.569H5.815L8.53 2.227a.5.5 0 0 0-.891-.454l-3.085 6.07A.5.5 0 0 0 5 8.568h5.185L7.54 13.773z"></path></defs><use xlink:href="#bolt-a"></use></svg>
+            <span class="euiCallOutHeader__title">This API is still beta!</span>
+          </div>
+          <div class="euiText euiText--small">
+            <p>Meaning it is on a way to become a stable API, but might still be subject to changes in upcoming releases.</p></div></div>
+      {{/if}}
+
+      {{#if this.swagger}}
+        <redoc spec-url='{{this.file}}'></redoc>
+        <script src="https://rebilly.github.io/ReDoc/releases/latest/redoc.min.js"></script>
+      {{else}}
+        {{{content}}}
+      {{/if}}
+    </main>
+  </div>
+  <script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
