@@ -1,0 +1,7 @@
+contents:
+  - title: 'Visualizations'
+    contents:
+      - title: Embed visualizations
+        page: src/ui/public/inspector/README.md
+      - title: Use loader
+        jsdoc: visualize.loader
