@@ -16,6 +16,7 @@
       background-color: white;
       flex: 1 1 auto;
       padding: 16px;
+      overflow: auto;
     }
     .sidenav {
       padding: 16px;
@@ -41,8 +42,10 @@
   <div class="euiPageBody">
     <nav class="sidenav euiSideNav euiPageSideBar">
       <header class="sidenav__header">
-        <img height="60px" src="https://www.elastic.co/assets/bltf11265439e44d327/logo-elastic-kibana-lt.svg">
-        <h1 class="euiTitle euiTitle--xsmall">Developer Documentation</h1>
+        <a href="/">
+          <img height="60px" src="https://www.elastic.co/assets/bltf11265439e44d327/logo-elastic-kibana-lt.svg">
+          <h1 class="euiTitle euiTitle--xsmall">Developer Documentation</h1>
+        </a>
       </header>
       <div class="euiSideNav__content">
         {{#each toc}}
@@ -100,7 +103,9 @@
             <span class="euiCallOutHeader__title">This API is still beta!</span>
           </div>
           <div class="euiText euiText--small">
-            <p>Meaning it is on a way to become a stable API, but might still be subject to changes in upcoming releases.</p></div></div>
+            <p>Meaning it is on a way to become a stable API, but might still be subject to changes in upcoming releases.</p>
+          </div>
+        </div>
       {{/if}}
 
       {{#if this.swagger}}

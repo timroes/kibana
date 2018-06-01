@@ -24,17 +24,10 @@ const Handlebars = require('handlebars');
 const MarkdownIt = require('markdown-it');
 const _ = require('lodash');
 const mkdirp = require('mkdirp');
-const jsdoc = require('jsdoc-api');
 const jsdoc2md = require('jsdoc-to-markdown');
 
 const config = yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, 'config.yml')));
 console.log(config);
-
-function buildPage({ title, page }) {
-  const content = fs.readFileSync(path.resolve(__dirname, '..', page), 'utf-8');
-  const render = md.render(content);
-  return render;
-}
 
 const templateContent = fs.readFileSync(path.resolve(__dirname, 'template/index.hbs'), 'utf-8');
 const template = Handlebars.compile(templateContent);
@@ -58,13 +51,19 @@ config.contents.forEach(group => {
 
 const md = new MarkdownIt({ html: true });
 
+function buildPage(file) {
+  const content = fs.readFileSync(path.resolve(__dirname, '..', file), 'utf-8');
+  const render = md.render(content);
+  return render;
+}
+
 // Remember old renderer, if overriden, or proxy to default renderer
-var defaultRender = md.renderer.rules.link_open || function(tokens, idx, options, env, self) {
+const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
   return self.renderToken(tokens, idx, options);
 };
 
 md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-  const href = tokens[idx].attrGet('href')
+  const href = tokens[idx].attrGet('href');
   if (href.startsWith('page:')) {
     const pageId = href.substr(5);
     tokens[idx].attrSet('href', pageSlugs[pageId]);
@@ -91,16 +90,24 @@ const toc = config.contents.map(group => {
   };
 });
 
+// Buid home page
+const homeMd = buildPage(config.home);
+const compiled = template({
+  toc,
+  content: homeMd,
+});
+fs.writeFileSync(path.resolve(__dirname, 'out/index.html'), compiled, 'utf-8');
+
 toc.forEach(group => {
   group.contents.forEach(async page => {
     const pathname = path.resolve(__dirname, 'out', `.${page.slug}`);
-    let context = {
+    const context = {
       slug: page.slug,
     };
 
     if (page.page) {
       context.page = true;
-      context.content = buildPage(page);
+      context.content = buildPage(page.page);
     } else if (page.jsdoc) {
       context.jsdocs = true;
       context.content = md.render(jsdoc2md.renderSync({ files: page.jsdoc }));
