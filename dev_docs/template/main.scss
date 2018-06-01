@@ -1,0 +1,16 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+}
+
+#documentation {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+}

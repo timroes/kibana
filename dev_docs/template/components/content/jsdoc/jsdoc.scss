@@ -1,0 +1,20 @@
+.jsdoc__toc {
+  max-width: 250px;
+}
+
+.jsdoc-entry__title {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-weight: 700;
+  font-size: 1.2em;
+  line-height: 2.5em;
+  color: #3185FC;
+}
+
+.jsdoc-entry__params-table table {
+  table-layout: auto;
+}
+
+.jsdoc-param__name code,
+.jsdoc__types code {
+  white-space: nowrap !important;
+}

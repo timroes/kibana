@@ -42,11 +42,11 @@ import { EmbeddedVisualizeHandler } from './embedded_visualize_handler';
  * @property {object} timeRange An object with a from/to key, that must be
  *    either a date in ISO format, or a valid datetime Elasticsearch expression,
  *    e.g.: { from: 'now-7d/d', to: 'now' }
- * @property {boolean} showSpyPanel Whether or not the spy panel should be available
+ * @property {boolean} [showSpyPanel] Whether or not the spy panel should be available
  *    on this chart. If set to true, spy panels will only be shown if there are
  *    spy panels available for this specific visualization, since not every visualization
  *    supports all spy panels. (default: false)
- * @property {boolean} append If set to true, the visualization will be appended
+ * @property {boolean} [append=true] If set to true, the visualization will be appended
  *    to the passed element instead of replacing all its content. (default: false)
  * @property {string} cssClass If specified this CSS class (or classes with space separated)
  *    will be set to the root visuzalize element.
@@ -96,7 +96,7 @@ const VisualizeLoaderProvider = ($compile, $rootScope, savedVisualizations) => {
      *
      * @param {Element} element The DOM element to render the visualization into.
      *    You can alternatively pass a jQuery element instead.
-     * @param {String} id The id of the saved visualization. This is the id of the
+     * @param {String} [id=foo] The id of the saved visualization. This is the id of the
      *    saved object that is stored in the .kibana index.
      * @param {VisualizeLoaderParams} params A list of parameters that will influence rendering.
      *
@@ -116,7 +116,7 @@ const VisualizeLoaderProvider = ($compile, $rootScope, savedVisualizations) => {
      * In most of the cases you will need this method, since it allows you to specify
      * filters, handlers, queries, etc. on the savedObject before rendering.
      *
-     * @param {Element} element The DOM element to render the visualization into.
+     * @param {(Element|Node)} element The DOM element to render the visualization into.
      *    You can alternatively pass a jQuery element instead.
      * @param {Object} savedObj The savedObject as it could be retrieved by the
      *    `savedVisualizations` service.

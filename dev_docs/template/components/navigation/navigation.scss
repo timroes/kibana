@@ -1,0 +1,13 @@
+@import '@elastic/eui/src/theme_light.scss';
+
+.navigation {
+  padding: $euiSize;
+  min-width: 240px;
+  max-width: 400px;
+}
+
+.navigation__header {
+  border-bottom: 1px solid $euiColorLightShade;
+  padding-bottom: $euiSize;
+  margin-bottom: $euiSize;
+}

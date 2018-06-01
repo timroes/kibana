@@ -1,0 +1,15 @@
+@import '@elastic/eui/src/theme_light.scss';
+
+.devdocs {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+
+.devdocs__content {
+  flex: 1 1 auto;
+  background: white;
+  overflow: auto;
+  border-left: 1px solid $euiColorLightShade;
+  padding: $euiSize;
+}

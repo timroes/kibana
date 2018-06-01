@@ -1,12 +1,12 @@
 home: dev_docs/HOME.md
 contents:
   - title: 'Inspector'
-    contents:
+    items:
       - title: Extend Inspector
-        page: src/ui/public/visualize/loader/loader-examples.md
+        markdown: src/ui/public/visualize/loader/loader_examples.md
         id: extend-inspector
       - title: Use Inspector
-        page: src/ui/public/visualize/loader/loader-usage.md
+        markdown: src/ui/public/visualize/loader/loader_usage.md
         id: use-inspector
       - title: Inspector JS API
         id: inspector-api
@@ -14,4 +14,4 @@ contents:
       - title: Inspector API
         stage: beta
         id: inspector-server-api
-        swagger: src/ui/public/visualize/loader/inspector-api.yml
+        swagger: src/ui/public/visualize/loader/inspector_api.spec

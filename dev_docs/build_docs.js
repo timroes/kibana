@@ -20,17 +20,15 @@
 const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
-const Handlebars = require('handlebars');
 const MarkdownIt = require('markdown-it');
 const _ = require('lodash');
 const mkdirp = require('mkdirp');
+const webpack = require('webpack');
 const jsdoc2md = require('jsdoc-to-markdown');
+const getWebpackConfig = require('./webpack.config.js');
 
 const config = yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, 'config.yml')));
 console.log(config);
-
-const templateContent = fs.readFileSync(path.resolve(__dirname, 'template/index.hbs'), 'utf-8');
-const template = Handlebars.compile(templateContent);
 
 function getSlug(group, page) {
   return `/${_.kebabCase(group.title)}/${_.kebabCase(page.title)}`;
@@ -40,7 +38,7 @@ const pageSlugs = {};
 const jsdocs = {};
 
 config.contents.forEach(group => {
-  group.contents.forEach(page => {
+  group.items.forEach(page => {
     if (page.id) {
       pageSlugs[page.id] = getSlug(group, page);
     } else if (page.jsdoc) {
@@ -50,12 +48,6 @@ config.contents.forEach(group => {
 });
 
 const md = new MarkdownIt({ html: true });
-
-function buildPage(file) {
-  const content = fs.readFileSync(path.resolve(__dirname, '..', file), 'utf-8');
-  const render = md.render(content);
-  return render;
-}
 
 // Remember old renderer, if overriden, or proxy to default renderer
 const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
@@ -76,56 +68,65 @@ md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
   return defaultRender(tokens, idx, options, env, self);
 };
 
+function getType(page) {
+  if (page.markdown) {
+    return 'markdown';
+  } else if (page.swagger) {
+    return 'swagger';
+  } else if (page.jsdoc) {
+    return 'jsdoc';
+  } else {
+    throw new Error(`The page ${page.title} is missing a proper type.`);
+  }
+}
+
 const toc = config.contents.map(group => {
   return {
     title: group.title,
-    contents: group.contents.map(page => {
+    items: group.items.map(page => {
       return {
         ...page,
-        isBeta: page.stage === 'beta',
-        isExperimental: page.stage === 'experimental',
         slug: getSlug(group, page),
+        type: getType(page),
       };
     })
   };
 });
 
+
 // Buid home page
-const homeMd = buildPage(config.home);
-const compiled = template({
-  toc,
-  content: homeMd,
-});
-fs.writeFileSync(path.resolve(__dirname, 'out/index.html'), compiled, 'utf-8');
+// const homeMd = buildPage(config.home);
+// const compiled = template({
+//   toc,
+//   content: homeMd,
+// });
+// fs.writeFileSync(path.resolve(__dirname, 'out/index.html'), compiled, 'utf-8');
 
 toc.forEach(group => {
-  group.contents.forEach(async page => {
+  group.items.forEach(async page => {
     const pathname = path.resolve(__dirname, 'out', `.${page.slug}`);
+    await new Promise(resolve => mkdirp(pathname, resolve));
     const context = {
-      slug: page.slug,
+      page: { ...page },
     };
 
-    if (page.page) {
-      context.page = true;
-      context.content = buildPage(page.page);
+    if (page.markdown) {
+      context.page.type = 'markdown';
+      context.page.markdown = fs.readFileSync(path.resolve(__dirname, '..', page.markdown), 'utf-8');
     } else if (page.jsdoc) {
-      context.jsdocs = true;
-      context.content = md.render(jsdoc2md.renderSync({ files: page.jsdoc }));
+      context.page.type = 'jsdoc';
+      context.page.jsdoc = await jsdoc2md.getTemplateData({ files: page.jsdoc });
     } else if (page.swagger) {
-      context.swagger = true;
-      const filename = _.kebabCase(page.title);
-      fs.createReadStream(path.resolve(__dirname, '..', page.swagger))
-        .pipe(fs.createWriteStream(`${pathname}/${filename}.spec`));
-      context.file = `${page.slug}/${filename}.spec`;
+      context.page.type = 'swagger';
+      const specString = fs.readFileSync(path.resolve(__dirname, '..', page.swagger));
+      const spec = yaml.safeLoad(specString);
+      context.page.apiSpec = spec;
     }
 
-    context.isBeta = page.isBeta;
-    context.isExperimental = page.isExperimental;
     context.toc = toc;
-    context.title = page.title;
 
-    const compiled = template(context);
-    await new Promise(resolve => mkdirp(pathname, resolve));
-    fs.writeFileSync(`${pathname}/index.html`, compiled);
+    webpack(getWebpackConfig(page.slug, context), (err) => {
+      console.log(err);
+    });
   });
 });
