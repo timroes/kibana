@@ -1,5 +1,9 @@
 home: dev_docs/HOME.md
 contents:
+  - title: General
+    items:
+      - title: State API
+        jsdoc: dev_docs/jsdoc_test/**/*
   - title: 'Inspector'
     items:
       - title: Extend Inspector

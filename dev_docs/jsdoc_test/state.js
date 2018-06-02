@@ -17,35 +17,8 @@
  * under the License.
  */
 
-import React from 'react';
-
-import { typeLink } from '../../../lib/links';
-
-import {
-  EuiCode
-} from '@elastic/eui';
-
-function JsdocType({ type, isLast }) {
-  const link = typeLink(type);
-
-  return (
-    <React.Fragment>
-      {link && <a href={link}>{type}</a>}
-      {!link && type}
-      {!isLast && ' | '}
-    </React.Fragment>
-  );
-}
-
-
-function JsdocTypes({ types }) {
-  return (
-    <EuiCode className="jsdoc__types">
-      {types.names.map((type, index) => (
-        <JsdocType key={index} type={type} isLast={index === types.names.length - 1}/>
-      ))}
-    </EuiCode>
-  );
-}
-
-export { JsdocTypes };
+/**
+ * This is the explanation of the app state.
+ * @typedef AppState
+ * @property {string} id - The id of the app state.
+ */

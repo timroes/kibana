@@ -17,35 +17,13 @@
  * under the License.
  */
 
-import React from 'react';
+/* global templateData */
+const { pages, types } = templateData;
 
-import { typeLink } from '../../../lib/links';
-
-import {
-  EuiCode
-} from '@elastic/eui';
-
-function JsdocType({ type, isLast }) {
-  const link = typeLink(type);
-
-  return (
-    <React.Fragment>
-      {link && <a href={link}>{type}</a>}
-      {!link && type}
-      {!isLast && ' | '}
-    </React.Fragment>
-  );
+export function pageLink(pageId) {
+  return pages[pageId];
 }
 
-
-function JsdocTypes({ types }) {
-  return (
-    <EuiCode className="jsdoc__types">
-      {types.names.map((type, index) => (
-        <JsdocType key={index} type={type} isLast={index === types.names.length - 1}/>
-      ))}
-    </EuiCode>
-  );
+export function typeLink(type) {
+  return types[type] ? `${types[type]}/#${type}` : null;
 }
-
-export { JsdocTypes };

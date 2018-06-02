@@ -14,5 +14,7 @@ And more stuff, we should then test out links here:
 
 * [page link](page:use-inspector)
 * [API](page:inspector-api)
+* [AppState API](jsdoc:AppState)
+* [Invalid page link](page:wrong-page)
 
 We can also have `inline code` that looks nice.

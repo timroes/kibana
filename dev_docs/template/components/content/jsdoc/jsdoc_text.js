@@ -18,52 +18,39 @@
  */
 
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
-
-import {
-  EuiCode,
-  EuiCodeBlock,
-  EuiText,
-} from '@elastic/eui';
 
 import { pageLink, typeLink } from '../../../lib/links';
 
-const renderers = {
-  code: ({ value, language }) => (
-    <EuiCodeBlock
-      language={language}
-      paddingSize="m"
-    >
-      {value}
-    </EuiCodeBlock>
-  ),
-  inlineCode: EuiCode,
-};
+const inlineTags = /(\{@[^}]+})/g;
+const linkRegex = /^\{@(tutorial|link) ([^}|]+)(?:\|([^}]+))?\}$/;
 
-function transformLink(uri) {
-  if (uri.startsWith('page:')) {
-    const pageId = uri.substr(5);
-    const page = pageLink(pageId);
-    return page ? page.slug : null;
-  } else if(uri.startsWith('jsdoc:')) {
-    const type = uri.substr(6);
-    const link = typeLink(type);
-    return link;
-  }
+function JsdocText({ text }) {
+  const content = text.split(inlineTags)
+    .reduce((prev, current) => {
+      const match = linkRegex.exec(current);
+      if (!match) {
+        return prev.concat(current);
+      }
+      const [, type, target, label] = match;
+      // For {@tutorials} link to actual pages.
+      if (type === 'tutorial') {
+        const page = pageLink(target);
+        if (!page) {
+          return prev.concat(label || target);
+        }
+        return prev.concat(<a href={page.slug}>{page.title}</a>);
+      } else {
+        const slug = typeLink(target);
+        return prev.concat(<a href={slug}>{label || target}</a>);
+      }
+      return prev.concat(current);
+    }, []);
 
-  return uri;
-}
-
-function MarkdownContent({ page }) {
   return (
-    <EuiText>
-      <ReactMarkdown
-        source={page.markdown}
-        renderers={renderers}
-        transformLinkUri={transformLink}
-      />
-    </EuiText>
+    <p>
+      {content}
+    </p>
   );
 }
 
-export { MarkdownContent };
+export { JsdocText };

@@ -22,6 +22,7 @@ import React from 'react';
 import { JsdocEntryTitle } from './jsdoc_entry_title';
 import { JsdocEntryParams } from './jsdoc_entry_params';
 import { JsdocTypes } from '../jsdoc_types';
+import { JsdocText } from '../jsdoc_text';
 
 import {
   EuiCodeBlock,
@@ -36,7 +37,7 @@ function JsdocEntry({ entry }) {
     <div className="jsdoc-entry">
       <JsdocEntryTitle entry={entry} />
       <EuiText>
-        <p>{entry.description}</p>
+        <JsdocText text={entry.description || ''} />
       </EuiText>
       {entry.params && entry.params.length > 0 &&
         <JsdocEntryParams
@@ -64,7 +65,7 @@ function JsdocEntry({ entry }) {
               </div>
               <EuiSpacer size="s" />
               <EuiText>
-                <p>{ret.description}</p>
+                <JsdocText text={ret.description || ''} />
               </EuiText>
             </React.Fragment>
           ))}

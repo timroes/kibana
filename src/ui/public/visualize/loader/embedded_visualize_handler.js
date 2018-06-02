@@ -23,7 +23,8 @@ const RENDER_COMPLETE_EVENT = 'render_complete';
 
 /**
  * A handler to the embedded visualization. It offers several methods to interact
- * with the visualization.
+ * with the visualization. You will find an overall instruction in the {@tutorial use-inspector|with label}.
+ * We can also link without label {@tutorial foobar} and to types {@link VisualizeLoaderParams}.
  */
 export class EmbeddedVisualizeHandler {
   constructor(element, scope) {

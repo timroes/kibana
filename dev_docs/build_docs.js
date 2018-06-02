@@ -20,7 +20,6 @@
 const yaml = require('js-yaml');
 const fs = require('fs');
 const path = require('path');
-const MarkdownIt = require('markdown-it');
 const _ = require('lodash');
 const mkdirp = require('mkdirp');
 const webpack = require('webpack');
@@ -47,27 +46,6 @@ config.contents.forEach(group => {
   });
 });
 
-const md = new MarkdownIt({ html: true });
-
-// Remember old renderer, if overriden, or proxy to default renderer
-const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
-  return self.renderToken(tokens, idx, options);
-};
-
-md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-  const href = tokens[idx].attrGet('href');
-  if (href.startsWith('page:')) {
-    const pageId = href.substr(5);
-    tokens[idx].attrSet('href', pageSlugs[pageId]);
-  }
-  if (href.startsWith('jsdoc:')) {
-    const jsdocId = href.substr(6);
-    tokens[idx].attrSet('href', jsdocs[jsdocId]);
-  }
-  // pass token to default renderer.
-  return defaultRender(tokens, idx, options, env, self);
-};
-
 function getType(page) {
   if (page.markdown) {
     return 'markdown';
@@ -80,19 +58,34 @@ function getType(page) {
   }
 }
 
+const pages = {};
+const types = {};
+
 const toc = config.contents.map(group => {
   return {
     title: group.title,
     items: group.items.map(page => {
+      const slug = getSlug(group, page);
+      if (page.id) {
+        pages[page.id] = {
+          slug,
+          title: page.title,
+        };
+      }
+      if (page.jsdoc) {
+        page.jsdoc = jsdoc2md.getTemplateDataSync({ files: page.jsdoc });
+        page.jsdoc.forEach(jsdocEntry => {
+          types[jsdocEntry.id] = slug;
+        });
+      }
       return {
         ...page,
-        slug: getSlug(group, page),
+        slug,
         type: getType(page),
       };
     })
   };
 });
-
 
 // Buid home page
 // const homeMd = buildPage(config.home);
@@ -115,7 +108,6 @@ toc.forEach(group => {
       context.page.markdown = fs.readFileSync(path.resolve(__dirname, '..', page.markdown), 'utf-8');
     } else if (page.jsdoc) {
       context.page.type = 'jsdoc';
-      context.page.jsdoc = await jsdoc2md.getTemplateData({ files: page.jsdoc });
     } else if (page.swagger) {
       context.page.type = 'swagger';
       const specString = fs.readFileSync(path.resolve(__dirname, '..', page.swagger));
@@ -123,7 +115,9 @@ toc.forEach(group => {
       context.page.apiSpec = spec;
     }
 
+    context.pages = pages;
     context.toc = toc;
+    context.types = types;
 
     webpack(getWebpackConfig(page.slug, context), (err) => {
       console.log(err);
