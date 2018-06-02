@@ -24,6 +24,7 @@ import { JsdocEntryParams } from './jsdoc_entry_params';
 import { JsdocTypes } from '../jsdoc_types';
 
 import {
+  EuiCodeBlock,
   EuiHorizontalRule,
   EuiSpacer,
   EuiText,
@@ -69,7 +70,25 @@ function JsdocEntry({ entry }) {
           ))}
         </React.Fragment>
       }
-      <EuiHorizontalRule size="half" />
+      {entry.examples && entry.examples.length > 0 &&
+        <React.Fragment>
+          <EuiSpacer size="m" />
+          <EuiTitle size="xs">
+            <h3>Examples</h3>
+          </EuiTitle>
+          <EuiSpacer size="s" />
+          <EuiText>
+            {entry.examples.map((example, index) => {
+              return (
+                <EuiCodeBlock language="js" paddingSize="m" key={index}>
+                  {example}
+                </EuiCodeBlock>
+              );
+            })}
+          </EuiText>
+        </React.Fragment>
+      }
+      <EuiHorizontalRule size="half" margin="xl" />
     </div>
   );
 }

@@ -94,6 +94,13 @@ const VisualizeLoaderProvider = ($compile, $rootScope, savedVisualizations) => {
     /**
      * Renders a saved visualization specified by its id into a DOM element.
      *
+     * @example
+     * import { getVisualizeLoader } from 'ui/visualize/loader';
+     *
+     * getVisualizeLoader().then(loader => {
+     *   loader.embedVisualizationWithId(document.getElementById('container'), '123', {});
+     * });
+     *
      * @param {Element} element The DOM element to render the visualization into.
      *    You can alternatively pass a jQuery element instead.
      * @param {String} [id=foo] The id of the saved visualization. This is the id of the
@@ -102,6 +109,7 @@ const VisualizeLoaderProvider = ($compile, $rootScope, savedVisualizations) => {
      *
      * @return {Promise.<EmbeddedVisualizeHandler>} A promise that resolves to the
      *    handler for this visualization as soon as the saved object could be found.
+     *
      */
     embedVisualizationWithId: async (element, savedVisualizationId, params) => {
       return new Promise((resolve, reject) => {
