@@ -50,6 +50,7 @@ import { getUnhashableStatesProvider } from 'ui/state_management/state_hashing';
 import { showSaveModal } from 'ui/saved_objects/show_saved_object_save_modal';
 import { SavedObjectSaveModal } from 'ui/saved_objects/components/saved_object_save_modal';
 import { getEditBreadcrumbs, getCreateBreadcrumbs } from '../breadcrumbs';
+import { documentationLinks } from 'ui/documentation_links';
 
 uiRoutes
   .when(VisualizeConstants.CREATE_PATH, {
@@ -240,6 +241,14 @@ function VisEditor(
       vis.forceReload();
     },
     testId: 'visualizeRefreshButton',
+  }, {
+    key: i18n('kbn.topNavManu.documentationLabel', { defaultMessage: 'documentation' }),
+    description: i18n('kbn.visualize.topNavMenu.documentationButtonDescription', {
+      defaultMessage: 'Documentation',
+    }),
+    run() {
+      $window.open(documentationLinks.kibana);
+    },
   }];
 
   let stateMonitor;
