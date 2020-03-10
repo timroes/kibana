@@ -9,7 +9,7 @@ import { render, unmountComponentAtNode } from 'react-dom';
 import { I18nProvider } from '@kbn/i18n/react';
 import { CoreSetup, CoreStart } from 'src/core/public';
 import {
-  ExpressionsSetup,
+  ExpressionsService,
   ExpressionsStart,
 } from '../../../../../../src/plugins/expressions/public';
 import {
@@ -36,7 +36,7 @@ import { getActiveDatasourceIdFromDoc } from './editor_frame/state_management';
 export interface EditorFrameSetupPlugins {
   data: DataPublicPluginSetup;
   embeddable: IEmbeddableSetup;
-  expressions: ExpressionsSetup;
+  expressions: ExpressionsService;
 }
 
 export interface EditorFrameStartPlugins {

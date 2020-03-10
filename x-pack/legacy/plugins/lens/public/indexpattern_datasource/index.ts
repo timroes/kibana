@@ -9,7 +9,7 @@ import { Storage } from '../../../../../../src/plugins/kibana_utils/public';
 import { getIndexPatternDatasource } from './indexpattern';
 import { renameColumns } from './rename_columns';
 import { getAutoDate } from './auto_date';
-import { ExpressionsSetup } from '../../../../../../src/plugins/expressions/public';
+import { ExpressionsService } from '../../../../../../src/plugins/expressions/public';
 import {
   DataPublicPluginSetup,
   DataPublicPluginStart,
@@ -17,7 +17,7 @@ import {
 import { Datasource, EditorFrameSetup } from '../types';
 
 export interface IndexPatternDatasourceSetupPlugins {
-  expressions: ExpressionsSetup;
+  expressions: ExpressionsService;
   data: DataPublicPluginSetup;
   editorFrame: EditorFrameSetup;
 }

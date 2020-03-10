@@ -19,7 +19,10 @@ import { addHelpMenuToAppChrome } from './help_menu_util';
 import { SavedObjectIndexStore } from './persistence';
 import { XyVisualization } from './xy_visualization';
 import { MetricVisualization } from './metric_visualization';
-import { ExpressionsSetup, ExpressionsStart } from '../../../../../src/plugins/expressions/public';
+import {
+  ExpressionsSetup,
+  ExpressionsService,
+} from '../../../../../src/plugins/expressions/public';
 import { DatatableVisualization } from './datatable_visualization';
 import { App } from './app_plugin';
 import {
@@ -55,7 +58,7 @@ export interface LensPluginSetupDependencies {
 export interface LensPluginStartDependencies {
   data: DataPublicPluginStart;
   embeddable: IEmbeddableStart;
-  expressions: ExpressionsStart;
+  expressions: ExpressionsService;
 }
 
 export const isRisonObject = (value: RisonValue): value is RisonObject => {
@@ -68,6 +71,7 @@ export class LensPlugin {
   private indexpatternDatasource: IndexPatternDatasource;
   private xyVisualization: XyVisualization;
   private metricVisualization: MetricVisualization;
+  private expressionsService!: ExpressionsService;
 
   constructor() {
     this.datatableVisualization = new DatatableVisualization();
@@ -87,13 +91,14 @@ export class LensPlugin {
       __LEGACY: { formatFactory, visualizations },
     }: LensPluginSetupDependencies
   ) {
+    this.expressionsService = expressions.fork();
     const editorFrameSetupInterface = this.editorFrameService.setup(core, {
       data,
       embeddable,
-      expressions,
+      expressions: this.expressionsService,
     });
     const dependencies = {
-      expressions,
+      expressions: this.expressionsService,
       data,
       editorFrame: editorFrameSetupInterface,
       formatFactory,
@@ -216,7 +221,10 @@ export class LensPlugin {
   }
 
   start(core: CoreStart, startDependencies: LensPluginStartDependencies) {
-    this.createEditorFrame = this.editorFrameService.start(core, startDependencies).createInstance;
+    this.createEditorFrame = this.editorFrameService.start(core, {
+      ...startDependencies,
+      expressions: this.expressionsService,
+    }).createInstance;
   }
 
   stop() {

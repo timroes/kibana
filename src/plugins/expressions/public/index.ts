@@ -78,6 +78,7 @@ export {
   ExpressionValueRender,
   ExpressionValueSearchContext,
   ExpressionValueUnboxed,
+  ExpressionsService,
   Filter,
   Font,
   FontLabel,
