@@ -282,10 +282,13 @@ export class DashboardAppController {
 
     const getEmptyScreenProps = (
       shouldShowEditHelp: boolean,
-      isEmptyInReadOnlyMode: boolean
+      isEmptyInReadOnlyMode: boolean,
+      sectionId?: string
     ): DashboardEmptyScreenProps => {
       const emptyScreenProps: DashboardEmptyScreenProps = {
-        onLinkClick: shouldShowEditHelp ? $scope.showAddPanel : $scope.enterEditMode,
+        onLinkClick: shouldShowEditHelp
+          ? $scope.showAddPanel.bind(undefined, sectionId)
+          : $scope.enterEditMode,
         showLinkToVisualize: shouldShowEditHelp,
         uiSettings,
         http,
@@ -379,7 +382,7 @@ export class DashboardAppController {
                 shouldShowEditHelp || shouldShowViewHelp || isEmptyInReadOnlyMode;
               return isEmptyState ? (
                 <DashboardEmptyScreen
-                  {...getEmptyScreenProps(shouldShowEditHelp, isEmptyInReadOnlyMode)}
+                  {...getEmptyScreenProps(shouldShowEditHelp, isEmptyInReadOnlyMode, sectionId)}
                 />
               ) : null;
             };
@@ -415,7 +418,6 @@ export class DashboardAppController {
 
               dashboardStateManager.handleDashboardContainerChanges(container);
               $scope.$evalAsync(() => {
-                console.log('dashboard_app_controller#dirty?', dirty);
                 if (dirty) {
                   updateState();
                 }
@@ -521,15 +523,10 @@ export class DashboardAppController {
           key
         ];
         if (!_.isEqual(containerValue, appStateValue)) {
-          console.log(JSON.stringify(appStateValue, null, 2));
-          console.log('^ appState <--> containerValue v');
-          console.log(JSON.stringify(containerValue, null, 2));
-          console.log('----------');
           (differences as { [key: string]: unknown })[key] = appStateValue;
         }
       });
 
-      console.log(`#### got differences in ${JSON.stringify(differences)}`);
       // cloneDeep hack is needed, as there are multiple place, where container's input mutated,
       // but values from appStateValue are deeply frozen, as they can't be mutated directly
       return Object.values(differences).length === 0 ? undefined : _.cloneDeep(differences);
@@ -825,14 +822,14 @@ export class DashboardAppController {
         });
     }
 
-    $scope.showAddPanel = () => {
+    $scope.showAddPanel = (sectionId?: string) => {
       dashboardStateManager.setFullScreenMode(false);
       /*
        * Temp solution for triggering menu click.
        * When de-angularizing this code, please call the underlaying action function
        * directly and not via the top nav object.
        **/
-      navActions[TopNavIds.ADD_EXISTING]();
+      navActions[TopNavIds.ADD_EXISTING](sectionId);
     };
     $scope.enterEditMode = () => {
       dashboardStateManager.setFullScreenMode(false);
@@ -930,7 +927,7 @@ export class DashboardAppController {
       showCloneModal(onClone, currentTitle);
     };
 
-    navActions[TopNavIds.ADD_EXISTING] = () => {
+    navActions[TopNavIds.ADD_EXISTING] = (sectionId?: string) => {
       if (dashboardContainer && !isErrorEmbeddable(dashboardContainer)) {
         openAddPanelFlyout({
           embeddable: dashboardContainer,
@@ -939,6 +936,7 @@ export class DashboardAppController {
           notifications,
           overlays,
           SavedObjectFinder: getSavedObjectFinder(savedObjects, uiSettings),
+          embeddableMetaInformation: { sectionId },
         });
       }
     };

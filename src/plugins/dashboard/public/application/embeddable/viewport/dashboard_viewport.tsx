@@ -44,10 +44,7 @@ export interface DashboardViewportProps {
   container: DashboardContainer;
   renderEmpty?: (sectionId?: string) => React.ReactNode;
   PanelComponent: EmbeddableStart['EmbeddablePanel'];
-  onAddToSection: (
-    section: DashboardSection,
-    previousSectionPanels: { [key: string]: DashboardPanelState }
-  ) => void;
+  onAddToSection: (section: DashboardSection) => void;
 }
 
 interface State {
@@ -184,7 +181,7 @@ export class DashboardViewport extends React.Component<DashboardViewportProps, S
   private renderSection = (section: DashboardSection) => {
     const { viewMode, collapsedStates } = this.state;
     const isCollapsed = collapsedStates[section.id];
-    const sectionPanels = panelsInSection(this.state.panels, section);
+    const sectionPanels = panelsInSection(this.state.panels, section.id);
     const textColor = section.color && isColorDark(...hexToRgb(section.color)) ? '#FFF' : undefined;
     return (
       <React.Fragment key={section.id}>
@@ -205,7 +202,7 @@ export class DashboardViewport extends React.Component<DashboardViewportProps, S
                 <EuiFlexItem grow={false}>
                   <EuiButtonIcon
                     iconType="plusInCircle"
-                    onClick={() => this.props.onAddToSection(section, sectionPanels)}
+                    onClick={() => this.props.onAddToSection(section)}
                     aria-label="Add panel to this section"
                   />
                 </EuiFlexItem>

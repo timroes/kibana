@@ -89,14 +89,18 @@ export interface IContainer<
 
   /**
    * Adds a new embeddable to the container. `explicitInput` may partially specify the required embeddable input,
-   * but the remainder must come from inherited container state.
+   * but the remainder must come from inherited container state. The meta information can be used to pass through information
+   * from some places that can trigger adding a new embeddable, to this function. The implementation must assume that this method
+   * can be called from places, that don't specify any meta information.
    */
   addNewEmbeddable<
     EEI extends EmbeddableInput = EmbeddableInput,
     EEO extends EmbeddableOutput = EmbeddableOutput,
-    E extends Embeddable<EEI, EEO> = Embeddable<EEI, EEO>
+    E extends Embeddable<EEI, EEO> = Embeddable<EEI, EEO>,
+    M = unknown
   >(
     type: string,
-    explicitInput: Partial<EEI>
+    explicitInput: Partial<EEI>,
+    meta?: M
   ): Promise<E | ErrorEmbeddable>;
 }

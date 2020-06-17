@@ -86,15 +86,16 @@ export abstract class Container<
   public async addNewEmbeddable<
     EEI extends EmbeddableInput = EmbeddableInput,
     EEO extends EmbeddableOutput = EmbeddableOutput,
-    E extends IEmbeddable<EEI, EEO> = IEmbeddable<EEI, EEO>
-  >(type: string, explicitInput: Partial<EEI>): Promise<E | ErrorEmbeddable> {
+    E extends IEmbeddable<EEI, EEO> = IEmbeddable<EEI, EEO>,
+    M = unknown
+  >(type: string, explicitInput: Partial<EEI>, meta?: M): Promise<E | ErrorEmbeddable> {
     const factory = this.getFactory(type) as EmbeddableFactory<EEI, EEO, E> | undefined;
 
     if (!factory) {
       throw new EmbeddableFactoryNotFoundError(type);
     }
 
-    const panelState = this.createNewPanelState<EEI, E>(factory, explicitInput);
+    const panelState = this.createNewPanelState<EEI, E>(factory, explicitInput, meta);
 
     return this.createAndSaveEmbeddable(type, panelState);
   }
@@ -182,10 +183,12 @@ export abstract class Container<
 
   protected createNewPanelState<
     TEmbeddableInput extends EmbeddableInput,
-    TEmbeddable extends IEmbeddable<TEmbeddableInput, any>
+    TEmbeddable extends IEmbeddable<TEmbeddableInput, any>,
+    M = unknown
   >(
     factory: EmbeddableFactory<TEmbeddableInput, any, TEmbeddable>,
-    partial: Partial<TEmbeddableInput> = {}
+    partial: Partial<TEmbeddableInput> = {},
+    meta?: M
   ): PanelState<TEmbeddableInput> {
     const embeddableId = partial.id || uuid.v4();
 

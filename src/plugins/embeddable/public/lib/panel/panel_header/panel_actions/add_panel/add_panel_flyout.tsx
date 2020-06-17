@@ -36,6 +36,7 @@ interface Props {
   getAllFactories: EmbeddableStart['getEmbeddableFactories'];
   notifications: CoreSetup['notifications'];
   SavedObjectFinder: React.ComponentType<any>;
+  embeddableMetaInformation?: unknown;
 }
 
 interface State {
@@ -87,7 +88,11 @@ export class AddPanelFlyout extends React.Component<Props, State> {
     }
 
     const explicitInput = await factory.getExplicitInput();
-    const embeddable = await this.props.container.addNewEmbeddable(type, explicitInput);
+    const embeddable = await this.props.container.addNewEmbeddable(
+      type,
+      explicitInput,
+      this.props.embeddableMetaInformation
+    );
     if (embeddable) {
       this.showToast(embeddable.getInput().title || '');
     }
@@ -104,7 +109,8 @@ export class AddPanelFlyout extends React.Component<Props, State> {
 
     this.props.container.addNewEmbeddable<SavedObjectEmbeddableInput>(
       factoryForSavedObjectType.type,
-      { savedObjectId }
+      { savedObjectId },
+      this.props.embeddableMetaInformation
     );
 
     this.showToast(name);

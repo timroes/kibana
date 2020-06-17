@@ -24,7 +24,8 @@ import { RefreshInterval, TimeRange, Query, Filter } from 'src/plugins/data/publ
 import { CoreStart } from 'src/core/public';
 import { Start as InspectorStartContract } from 'src/plugins/inspector/public';
 import uuid from 'uuid';
-import { EmbeddableFactoryNotFoundError } from '../../../../embeddable/public';
+import { getSavedObjectFinder } from '../../../../saved_objects/public';
+import { openAddPanelFlyout } from '../../../../embeddable/public';
 import { UiActionsStart } from '../../ui_actions_plugin';
 import {
   Container,
@@ -92,6 +93,15 @@ export interface DashboardContainerOptions {
   SavedObjectFinder: React.ComponentType<any>;
   ExitFullScreenButton: React.ComponentType<any>;
   uiActions: UiActionsStart;
+  core: CoreStart;
+}
+
+interface SectionIdMeta {
+  sectionId: string;
+}
+
+function isSectionIdMeta(param: unknown): param is SectionIdMeta {
+  return typeof param === 'object' && param !== null && 'sectionId' in param;
 }
 
 export type DashboardReactContextValue = KibanaReactContextValue<DashboardContainerOptions>;
@@ -122,18 +132,15 @@ export class DashboardContainer extends Container<InheritedChildInput, Dashboard
     TEmbeddable extends IEmbeddable<TEmbeddableInput, any>
   >(
     factory: EmbeddableFactory<TEmbeddableInput, any, TEmbeddable>,
-    partial: Partial<TEmbeddableInput> = {}
+    partial: Partial<TEmbeddableInput> = {},
+    meta?: unknown
   ): DashboardPanelState<TEmbeddableInput> => {
     const panelState = super.createNewPanelState(factory, partial);
-    // TODO: Potentially not the best UX solution
-    const sectionToAdd =
-      !this.input.sections || Math.random() < 0.5
-        ? undefined
-        : this.input.sections[Math.floor(Math.random() * this.input.sections.length)];
+    const sectionToAdd = isSectionIdMeta(meta) ? meta.sectionId : undefined;
     return createPanelState(
       panelState,
       panelsInSection(this.input.panels, sectionToAdd),
-      sectionToAdd?.id
+      sectionToAdd
     );
   };
 
@@ -194,24 +201,21 @@ export class DashboardContainer extends Container<InheritedChildInput, Dashboard
     });
   }
 
-  private addNewToSection = async (
-    section: DashboardSection,
-    sectionPanels: { [key: string]: DashboardPanelState }
-  ) => {
-    // const type = 'visualization';
-    // const factory = this.options.embeddable.getEmbeddableFactory(type);
-    // if (!factory) {
-    //   throw new EmbeddableFactoryNotFoundError(type);
-    // }
-    // const explicitInput = await factory.getExplicitInput();
-    // const embeddable = await super.createNewPanelState(factory, explicitInput);
-    // const panel = createPanelState(embeddable, sectionPanels, section);
-    // this.updateInput({
-    //   panels: {
-    //     ...this.input.panels,
-    //     [panel.explicitInput.id]: panel,
-    //   },
-    // });
+  private addNewToSection = async (section: DashboardSection) => {
+    openAddPanelFlyout({
+      embeddable: this,
+      getAllFactories: this.options.embeddable.getEmbeddableFactories,
+      getFactory: this.options.embeddable.getEmbeddableFactory,
+      notifications: this.options.notifications,
+      overlays: this.options.overlays,
+      SavedObjectFinder: getSavedObjectFinder(
+        this.options.core.savedObjects,
+        this.options.core.uiSettings
+      ),
+      embeddableMetaInformation: {
+        sectionId: section.id,
+      },
+    });
   };
 
   public render(dom: HTMLElement) {
