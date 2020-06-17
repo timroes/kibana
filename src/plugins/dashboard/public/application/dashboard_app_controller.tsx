@@ -224,8 +224,9 @@ export class DashboardAppController {
 
     $scope.showSaveQuery = dashboardCapabilities.saveQuery as boolean;
 
-    const getShouldShowEditHelp = () =>
-      !dashboardStateManager.getPanels().length &&
+    const getShouldShowEditHelp = (sectionId?: string) =>
+      !Object.values(dashboardStateManager.getPanels()).filter((p) => p.section === sectionId)
+        .length &&
       dashboardStateManager.getIsEditMode() &&
       !dashboardConfig.getHideWriteControls();
 
@@ -323,9 +324,10 @@ export class DashboardAppController {
         refreshConfig: timefilter.getRefreshInterval(),
         viewMode: dashboardStateManager.getViewMode(),
         panels: embeddablesMap,
+        sections: dashboardStateManager.getSections(),
         isFullScreenMode: dashboardStateManager.getFullScreenMode(),
         isEmbeddedExternally,
-        isEmptyState: shouldShowEditHelp || shouldShowViewHelp || isEmptyInReadonlyMode,
+        // isEmptyState: shouldShowEditHelp || shouldShowViewHelp || isEmptyInReadonlyMode,
         useMargins: dashboardStateManager.getUseMargins(),
         lastReloadRequestTime,
         title: dashboardStateManager.getTitle(),
@@ -369,8 +371,8 @@ export class DashboardAppController {
           if (container && !isErrorEmbeddable(container)) {
             dashboardContainer = container;
 
-            dashboardContainer.renderEmpty = () => {
-              const shouldShowEditHelp = getShouldShowEditHelp();
+            dashboardContainer.renderEmpty = (sectionId?: string) => {
+              const shouldShowEditHelp = getShouldShowEditHelp(sectionId);
               const shouldShowViewHelp = getShouldShowViewHelp();
               const isEmptyInReadOnlyMode = shouldShowUnauthorizedEmptyState();
               const isEmptyState =
@@ -413,6 +415,7 @@ export class DashboardAppController {
 
               dashboardStateManager.handleDashboardContainerChanges(container);
               $scope.$evalAsync(() => {
+                console.log('dashboard_app_controller#dirty?', dirty);
                 if (dirty) {
                   updateState();
                 }
@@ -518,10 +521,15 @@ export class DashboardAppController {
           key
         ];
         if (!_.isEqual(containerValue, appStateValue)) {
+          console.log(JSON.stringify(appStateValue, null, 2));
+          console.log('^ appState <--> containerValue v');
+          console.log(JSON.stringify(containerValue, null, 2));
+          console.log('----------');
           (differences as { [key: string]: unknown })[key] = appStateValue;
         }
       });
 
+      console.log(`#### got differences in ${JSON.stringify(differences)}`);
       // cloneDeep hack is needed, as there are multiple place, where container's input mutated,
       // but values from appStateValue are deeply frozen, as they can't be mutated directly
       return Object.values(differences).length === 0 ? undefined : _.cloneDeep(differences);

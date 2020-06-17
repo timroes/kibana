@@ -73,4 +73,6 @@ export type SavedDashboardPanel730ToLatest = Pick<
 > & {
   readonly id?: string;
   readonly type: string;
+  // TODO: find out if we can do this, since it's optional
+  readonly section?: string;
 };

@@ -37,6 +37,7 @@ import {
   DashboardAppStateInUrl,
   DashboardAppStateTransitions,
   SavedDashboardPanel,
+  DashboardSection,
 } from '../types';
 import {
   createStateContainer,
@@ -258,7 +259,12 @@ export class DashboardStateManager {
 
     if (dirty) {
       this.stateContainer.transitions.set('panels', Object.values(convertedPanelStateMap));
+      console.log(
+        'handleDashboardContainerChanges#panels',
+        JSON.stringify(Object.keys(convertedPanelStateMap))
+      );
       if (dirtyBecauseOfInitialStateMigration) {
+        console.log('dirtyBecaueOfInitialStateMigration');
         this.saveState({ replace: true });
       }
     }
@@ -269,6 +275,10 @@ export class DashboardStateManager {
 
     if (!_.isEqual(input.query, this.getQuery())) {
       this.setQuery(input.query);
+    }
+
+    if (!_.isEqual(input.sections, this.getSections())) {
+      this.stateContainer.transitions.set('sections', input.sections);
     }
 
     this.changeListeners.forEach((listener) => listener({ dirty }));
@@ -474,6 +484,10 @@ export class DashboardStateManager {
     return this.getIsEditMode() && (this.isDirty || hasTimeFilterChanged);
   }
 
+  public getSections(): DashboardSection[] | undefined {
+    return this.appState.sections;
+  }
+
   public getPanels(): SavedDashboardPanel[] {
     return this.appState.panels;
   }
@@ -625,7 +639,7 @@ export class DashboardStateManager {
 
   private toUrlState(state: DashboardAppState): DashboardAppStateInUrl {
     if (state.viewMode === ViewMode.VIEW) {
-      const { panels, ...stateWithoutPanels } = state;
+      const { panels, sections, ...stateWithoutPanels } = state;
       return stateWithoutPanels;
     }
 

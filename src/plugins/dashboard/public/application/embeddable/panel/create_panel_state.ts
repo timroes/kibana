@@ -36,6 +36,7 @@ export function createPanelState<
 >(
   panelState: PanelState<TEmbeddableInput>,
   currentPanels: { [key: string]: DashboardPanelState },
+  sectionId?: string,
   placementMethod?: PanelPlacementMethod<TPlacementMethodArgs>,
   placementArgs?: TPlacementMethodArgs
 ): DashboardPanelState<TEmbeddableInput> {
@@ -60,6 +61,7 @@ export function createPanelState<
       ...gridDataLocation,
       i: panelState.explicitInput.id,
     },
+    section: sectionId,
     ...panelState,
   };
 }

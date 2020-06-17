@@ -117,13 +117,14 @@ export interface DashboardGridProps extends ReactIntl.InjectedIntlProps {
   kibana: DashboardReactContextValue;
   PanelComponent: EmbeddableStart['EmbeddablePanel'];
   container: DashboardContainer;
+  panels: { [key: string]: DashboardPanelState };
+  onLayoutChanged: (panels: { [key: string]: DashboardPanelState }) => void;
 }
 
 interface State {
   focusedPanelIndex?: string;
   isLayoutInvalid: boolean;
   layout?: GridData[];
-  panels: { [key: string]: DashboardPanelState };
   viewMode: ViewMode;
   useMargins: boolean;
   expandedPanelId?: string;
@@ -147,7 +148,6 @@ class DashboardGridUi extends React.Component<DashboardGridProps, State> {
       layout: [],
       isLayoutInvalid: false,
       focusedPanelIndex: undefined,
-      panels: this.props.container.getInput().panels,
       viewMode: this.props.container.getInput().viewMode,
       useMargins: this.props.container.getInput().useMargins,
       expandedPanelId: this.props.container.getInput().expandedPanelId,
@@ -183,7 +183,6 @@ class DashboardGridUi extends React.Component<DashboardGridProps, State> {
       .subscribe((input: DashboardContainerInput) => {
         if (this.mounted) {
           this.setState({
-            panels: input.panels,
             viewMode: input.viewMode,
             useMargins: input.useMargins,
             expandedPanelId: input.expandedPanelId,
@@ -200,13 +199,13 @@ class DashboardGridUi extends React.Component<DashboardGridProps, State> {
   }
 
   public buildLayoutFromPanels = (): GridData[] => {
-    return _.map(this.state.panels, (panel) => {
+    return _.map(this.props.panels, (panel) => {
       return panel.gridData;
     });
   };
 
   public onLayoutChange = (layout: PanelLayout[]) => {
-    const panels = this.state.panels;
+    const panels = this.props.panels;
     const updatedPanels: { [key: string]: DashboardPanelState } = layout.reduce(
       (updatedPanelsAcc, panelLayout) => {
         updatedPanelsAcc[panelLayout.i] = {
@@ -217,13 +216,7 @@ class DashboardGridUi extends React.Component<DashboardGridProps, State> {
       },
       {} as { [key: string]: DashboardPanelState }
     );
-    this.onPanelsUpdated(updatedPanels);
-  };
-
-  public onPanelsUpdated = (panels: { [key: string]: DashboardPanelState }) => {
-    this.props.container.updateInput({
-      panels,
-    });
+    this.props.onLayoutChanged(updatedPanels);
   };
 
   public onPanelFocused = (focusedPanelIndex: string): void => {
@@ -237,7 +230,8 @@ class DashboardGridUi extends React.Component<DashboardGridProps, State> {
   };
 
   public renderPanels() {
-    const { focusedPanelIndex, panels, expandedPanelId } = this.state;
+    const { panels } = this.props;
+    const { focusedPanelIndex, expandedPanelId } = this.state;
 
     // Part of our unofficial API - need to render in a consistent order for plugins.
     const panelsInOrder = Object.keys(panels).map(

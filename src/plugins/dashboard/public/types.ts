@@ -57,6 +57,13 @@ interface FieldSubType {
   nested?: { path: string };
 }
 
+export interface DashboardSection {
+  id: string;
+  title: string;
+  initiallyCollapsed: boolean;
+  color?: string;
+}
+
 export interface Field {
   name: string;
   type: string;
@@ -78,6 +85,7 @@ export type SavedDashboardPanel = SavedDashboardPanel730ToLatest;
 
 export interface DashboardAppState {
   panels: SavedDashboardPanel[];
+  sections?: DashboardSection[];
   fullScreenMode: boolean;
   title: string;
   description: string;

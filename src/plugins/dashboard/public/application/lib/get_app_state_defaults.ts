@@ -32,6 +32,7 @@ export function getAppStateDefaults(
     timeRestore: savedDashboard.timeRestore,
     panels: savedDashboard.panelsJSON ? JSON.parse(savedDashboard.panelsJSON) : [],
     options: savedDashboard.optionsJSON ? JSON.parse(savedDashboard.optionsJSON) : {},
+    sections: savedDashboard.sections,
     query: savedDashboard.getQuery(),
     filters: savedDashboard.getFilters(),
     viewMode: savedDashboard.id || hideWriteControls ? ViewMode.VIEW : ViewMode.EDIT,

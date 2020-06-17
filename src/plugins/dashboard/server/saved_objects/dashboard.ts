@@ -48,6 +48,7 @@ export const dashboardSavedObjectType: SavedObjectsType = {
       kibanaSavedObjectMeta: { properties: { searchSourceJSON: { type: 'text' } } },
       optionsJSON: { type: 'text' },
       panelsJSON: { type: 'text' },
+      sections: { type: 'object', enabled: false },
       refreshInterval: {
         properties: {
           display: { type: 'keyword' },

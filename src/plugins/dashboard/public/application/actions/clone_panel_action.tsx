@@ -81,6 +81,7 @@ export class ClonePanelAction implements ActionByType<typeof ACTION_CLONE_PANEL>
 
     dashboard.showPlaceholderUntil(
       this.cloneEmbeddable(panelToClone, embeddable.type),
+      panelToClone.section,
       placePanelBeside,
       {
         width: panelToClone.gridData.w,
@@ -117,13 +118,15 @@ export class ClonePanelAction implements ActionByType<typeof ACTION_CLONE_PANEL>
     panelToClone: DashboardPanelState,
     embeddableType: string
   ): Promise<Partial<PanelState>> {
-    const panelState: PanelState<EmbeddableInput> = {
+    const panelState: Partial<DashboardPanelState<EmbeddableInput>> = {
       type: embeddableType,
       explicitInput: {
         ...panelToClone.explicitInput,
         id: uuid.v4(),
       },
+      section: panelToClone.section,
     };
+
     let newTitle: string = '';
     if (panelToClone.explicitInput.savedObjectId) {
       // Fetch existing saved object
@@ -142,7 +145,8 @@ export class ClonePanelAction implements ActionByType<typeof ACTION_CLONE_PANEL>
         },
         { references: _.cloneDeep(savedObjectToClone.references) }
       );
-      panelState.explicitInput.savedObjectId = clonedSavedObject.id;
+      // We know explicitInput is always set here, since we set it a couple of lines above.
+      panelState.explicitInput!.savedObjectId = clonedSavedObject.id;
     }
     this.core.notifications.toasts.addSuccess({
       title: i18n.translate('dashboard.panel.clonedToast', {

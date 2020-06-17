@@ -24,6 +24,7 @@ import { RefreshInterval, TimeRange, Query, Filter } from 'src/plugins/data/publ
 import { CoreStart } from 'src/core/public';
 import { Start as InspectorStartContract } from 'src/plugins/inspector/public';
 import uuid from 'uuid';
+import { EmbeddableFactoryNotFoundError } from '../../../../embeddable/public';
 import { UiActionsStart } from '../../ui_actions_plugin';
 import {
   Container,
@@ -46,6 +47,8 @@ import {
 } from '../../../../kibana_react/public';
 import { PLACEHOLDER_EMBEDDABLE } from './placeholder';
 import { PanelPlacementMethod, IPanelPlacementArgs } from './panel/dashboard_panel_placement';
+import { DashboardSection } from '../../types';
+import { panelsInSection } from '../lib/section_utils';
 
 export interface DashboardContainerInput extends ContainerInput {
   viewMode: ViewMode;
@@ -62,6 +65,7 @@ export interface DashboardContainerInput extends ContainerInput {
   panels: {
     [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
   };
+  sections?: DashboardSection[];
   isEmptyState?: boolean;
 }
 
@@ -113,19 +117,29 @@ export class DashboardContainer extends Container<InheritedChildInput, Dashboard
     );
   }
 
-  protected createNewPanelState<
+  protected createNewPanelState = <
     TEmbeddableInput extends EmbeddableInput,
     TEmbeddable extends IEmbeddable<TEmbeddableInput, any>
   >(
     factory: EmbeddableFactory<TEmbeddableInput, any, TEmbeddable>,
     partial: Partial<TEmbeddableInput> = {}
-  ): DashboardPanelState<TEmbeddableInput> {
+  ): DashboardPanelState<TEmbeddableInput> => {
     const panelState = super.createNewPanelState(factory, partial);
-    return createPanelState(panelState, this.input.panels);
-  }
+    // TODO: Potentially not the best UX solution
+    const sectionToAdd =
+      !this.input.sections || Math.random() < 0.5
+        ? undefined
+        : this.input.sections[Math.floor(Math.random() * this.input.sections.length)];
+    return createPanelState(
+      panelState,
+      panelsInSection(this.input.panels, sectionToAdd),
+      sectionToAdd?.id
+    );
+  };
 
   public showPlaceholderUntil<TPlacementMethodArgs extends IPanelPlacementArgs>(
-    newStateComplete: Promise<Partial<PanelState>>,
+    newStateComplete: Promise<Partial<DashboardPanelState>>,
+    sectionId?: string,
     placementMethod?: PanelPlacementMethod<TPlacementMethodArgs>,
     placementArgs?: TPlacementMethodArgs
   ): void {
@@ -145,6 +159,7 @@ export class DashboardContainer extends Container<InheritedChildInput, Dashboard
     const placeholderPanelState = createPanelState(
       originalPanelState,
       this.input.panels,
+      sectionId,
       placementMethod,
       placementArgs
     );
@@ -179,6 +194,26 @@ export class DashboardContainer extends Container<InheritedChildInput, Dashboard
     });
   }
 
+  private addNewToSection = async (
+    section: DashboardSection,
+    sectionPanels: { [key: string]: DashboardPanelState }
+  ) => {
+    // const type = 'visualization';
+    // const factory = this.options.embeddable.getEmbeddableFactory(type);
+    // if (!factory) {
+    //   throw new EmbeddableFactoryNotFoundError(type);
+    // }
+    // const explicitInput = await factory.getExplicitInput();
+    // const embeddable = await super.createNewPanelState(factory, explicitInput);
+    // const panel = createPanelState(embeddable, sectionPanels, section);
+    // this.updateInput({
+    //   panels: {
+    //     ...this.input.panels,
+    //     [panel.explicitInput.id]: panel,
+    //   },
+    // });
+  };
+
   public render(dom: HTMLElement) {
     ReactDOM.render(
       <I18nProvider>
@@ -187,6 +222,7 @@ export class DashboardContainer extends Container<InheritedChildInput, Dashboard
             renderEmpty={this.renderEmpty}
             container={this}
             PanelComponent={this.options.embeddable.EmbeddablePanel}
+            onAddToSection={this.addNewToSection}
           />
         </KibanaContextProvider>
       </I18nProvider>,

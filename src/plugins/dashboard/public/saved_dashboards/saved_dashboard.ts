@@ -25,6 +25,7 @@ import { extractReferences, injectReferences } from './saved_dashboard_reference
 
 import { Filter, ISearchSource, Query, RefreshInterval } from '../../../../plugins/data/public';
 import { createDashboardEditUrl } from '../dashboard_constants';
+import { DashboardSection } from '../types';
 
 export interface SavedObjectDashboard extends SavedObject {
   id?: string;
@@ -32,6 +33,7 @@ export interface SavedObjectDashboard extends SavedObject {
   timeTo?: string;
   timeFrom?: string;
   description?: string;
+  sections?: DashboardSection[];
   panelsJSON: string;
   optionsJSON?: string;
   // TODO: write a migration to rid of this, it's only around for bwc.
@@ -59,6 +61,7 @@ export function createSavedDashboardClass(
       description: 'text',
       panelsJSON: 'text',
       optionsJSON: 'text',
+      sections: 'object',
       version: 'integer',
       timeRestore: 'boolean',
       timeTo: 'keyword',
@@ -94,6 +97,7 @@ export function createSavedDashboardClass(
           hits: 0,
           description: '',
           panelsJSON: '[]',
+          sections: [],
           optionsJSON: JSON.stringify({
             // for BWC reasons we can't default dashboards that already exist without this setting to true.
             useMargins: !id,
