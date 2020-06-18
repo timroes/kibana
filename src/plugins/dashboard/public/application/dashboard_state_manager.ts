@@ -259,12 +259,7 @@ export class DashboardStateManager {
 
     if (dirty) {
       this.stateContainer.transitions.set('panels', Object.values(convertedPanelStateMap));
-      console.log(
-        'handleDashboardContainerChanges#panels',
-        JSON.stringify(Object.keys(convertedPanelStateMap))
-      );
       if (dirtyBecauseOfInitialStateMigration) {
-        console.log('dirtyBecaueOfInitialStateMigration');
         this.saveState({ replace: true });
       }
     }

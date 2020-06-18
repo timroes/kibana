@@ -18,7 +18,6 @@
  */
 
 import { DashboardPanelState } from '../embeddable';
-import { DashboardSection } from '../../types';
 
 export function panelsInSection(
   panels: { [panelId: string]: DashboardPanelState },
@@ -31,9 +30,9 @@ export function panelsInSection(
 
 export function panelsExcludingSection(
   panels: { [panelId: string]: DashboardPanelState },
-  section?: DashboardSection
+  sectionId?: string
 ) {
   return Object.fromEntries(
-    Object.entries(panels).filter(([id, panel]) => panel.section !== section?.id)
+    Object.entries(panels).filter(([id, panel]) => panel.section !== sectionId)
   );
 }

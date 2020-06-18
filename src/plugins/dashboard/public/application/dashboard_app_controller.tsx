@@ -313,9 +313,6 @@ export class DashboardAppController {
       if (dashboardContainer && !isErrorEmbeddable(dashboardContainer)) {
         expandedPanelId = dashboardContainer.getInput().expandedPanelId;
       }
-      const shouldShowEditHelp = getShouldShowEditHelp();
-      const shouldShowViewHelp = getShouldShowViewHelp();
-      const isEmptyInReadonlyMode = shouldShowUnauthorizedEmptyState();
       return {
         id: dashboardStateManager.savedDashboard.id || '',
         filters: queryFilter.getFilters(),
@@ -330,7 +327,6 @@ export class DashboardAppController {
         sections: dashboardStateManager.getSections(),
         isFullScreenMode: dashboardStateManager.getFullScreenMode(),
         isEmbeddedExternally,
-        // isEmptyState: shouldShowEditHelp || shouldShowViewHelp || isEmptyInReadonlyMode,
         useMargins: dashboardStateManager.getUseMargins(),
         lastReloadRequestTime,
         title: dashboardStateManager.getTitle(),
@@ -829,7 +825,7 @@ export class DashboardAppController {
        * When de-angularizing this code, please call the underlaying action function
        * directly and not via the top nav object.
        **/
-      navActions[TopNavIds.ADD_EXISTING](sectionId);
+      addExisting(sectionId);
     };
     $scope.enterEditMode = () => {
       dashboardStateManager.setFullScreenMode(false);
@@ -927,7 +923,7 @@ export class DashboardAppController {
       showCloneModal(onClone, currentTitle);
     };
 
-    navActions[TopNavIds.ADD_EXISTING] = (sectionId?: string) => {
+    const addExisting = (sectionId?: string) => {
       if (dashboardContainer && !isErrorEmbeddable(dashboardContainer)) {
         openAddPanelFlyout({
           embeddable: dashboardContainer,
@@ -939,6 +935,10 @@ export class DashboardAppController {
           embeddableMetaInformation: { sectionId },
         });
       }
+    };
+
+    navActions[TopNavIds.ADD_EXISTING] = () => {
+      addExisting();
     };
 
     navActions[TopNavIds.VISUALIZE] = async () => {

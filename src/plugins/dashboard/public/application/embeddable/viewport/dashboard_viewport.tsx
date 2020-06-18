@@ -19,18 +19,6 @@
 
 import React from 'react';
 import { Subscription } from 'rxjs';
-import uuid from 'uuid';
-import {
-  EuiButtonGroup,
-  EuiButtonEmpty,
-  EuiButtonIcon,
-  EuiFlexItem,
-  EuiFlexGroup,
-  euiPaletteColorBlind,
-  isColorDark,
-  hexToRgb,
-} from '@elastic/eui';
-import { i18n } from '@kbn/i18n';
 import { ViewMode } from '../../../../../embeddable/public';
 import { EmbeddableStart } from '../../../embeddable_plugin';
 import { DashboardContainer, DashboardReactContextValue } from '../dashboard_container';
@@ -38,13 +26,13 @@ import { DashboardGrid } from '../grid';
 import { context } from '../../../../../kibana_react/public';
 import { DashboardPanelState } from '../types';
 import { DashboardSection } from '../../../types';
-import { panelsInSection, panelsExcludingSection } from '../../lib/section_utils';
+import { panelsInSection, panelsExcludingSection, SectionHeader } from '../../sections';
 
 export interface DashboardViewportProps {
   container: DashboardContainer;
   renderEmpty?: (sectionId?: string) => React.ReactNode;
   PanelComponent: EmbeddableStart['EmbeddablePanel'];
-  onAddToSection: (section: DashboardSection) => void;
+  onAddToSection: (sectionId: string) => void;
 }
 
 interface State {
@@ -85,9 +73,7 @@ export class DashboardViewport extends React.Component<DashboardViewportProps, S
       sections,
       isEmbeddedExternally,
       viewMode,
-      collapsedStates: Object.fromEntries(
-        sections?.map((s) => [s.id, s.initiallyCollapsed] as const) ?? []
-      ),
+      collapsedStates: {},
     };
   }
 
@@ -132,21 +118,27 @@ export class DashboardViewport extends React.Component<DashboardViewportProps, S
     });
   };
 
-  private onToggleSection = (section: DashboardSection) => {
+  private onToggleSection = (sectionId: string) => {
     this.setState((prevState) => ({
       ...prevState,
       collapsedStates: {
         ...prevState.collapsedStates,
-        [section.id]: !prevState.collapsedStates[section.id],
+        [sectionId]: !prevState.collapsedStates[sectionId],
       },
     }));
   };
 
-  private onRemoveSection = (section: DashboardSection) => {
+  private onSectionChanged = (section: DashboardSection) => {
+    this.props.container.updateInput({
+      sections: this.state.sections?.map((s) => (s.id === section.id ? section : s)),
+    });
+  };
+
+  private onRemoveSection = (sectionId: string) => {
     // TODO: most likely needs to do more cleanup, or should use the remove panel action?
     this.props.container.updateInput({
-      sections: this.state.sections?.filter((s) => s.id !== section.id),
-      panels: panelsExcludingSection(this.state.panels, section),
+      sections: this.state.sections?.filter((s) => s.id !== sectionId),
+      panels: panelsExcludingSection(this.state.panels, sectionId),
     });
   };
 
@@ -182,52 +174,17 @@ export class DashboardViewport extends React.Component<DashboardViewportProps, S
     const { viewMode, collapsedStates } = this.state;
     const isCollapsed = collapsedStates[section.id];
     const sectionPanels = panelsInSection(this.state.panels, section.id);
-    const textColor = section.color && isColorDark(...hexToRgb(section.color)) ? '#FFF' : undefined;
     return (
       <React.Fragment key={section.id}>
-        <h1 style={{ backgroundColor: section.color, color: textColor }}>
-          <EuiFlexGroup alignItems="center" gutterSize="s">
-            <EuiFlexItem>
-              <EuiButtonEmpty
-                flush="left"
-                iconType={isCollapsed ? 'arrowRight' : 'arrowDown'}
-                onClick={() => this.onToggleSection(section)}
-                color="text"
-              >
-                {section.title}
-              </EuiButtonEmpty>
-            </EuiFlexItem>
-            {viewMode === ViewMode.EDIT && (
-              <>
-                <EuiFlexItem grow={false}>
-                  <EuiButtonIcon
-                    iconType="plusInCircle"
-                    onClick={() => this.props.onAddToSection(section)}
-                    aria-label="Add panel to this section"
-                  />
-                </EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <EuiButtonIcon
-                    iconType="gear"
-                    aria-label={i18n.translate('dashboard.section.settings', {
-                      defaultMessage: 'Section settings',
-                    })}
-                  />
-                </EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <EuiButtonIcon
-                    iconType="trash"
-                    color="danger"
-                    aria-label={i18n.translate('dashboard.section.removeSection', {
-                      defaultMessage: 'Remove section',
-                    })}
-                    onClick={this.onRemoveSection.bind(this, section)}
-                  />
-                </EuiFlexItem>
-              </>
-            )}
-          </EuiFlexGroup>
-        </h1>
+        <SectionHeader
+          viewMode={viewMode}
+          section={section}
+          onSectionChange={this.onSectionChanged}
+          isCollapsed={isCollapsed}
+          onToggleSection={this.onToggleSection}
+          onAddPanelToSection={this.props.onAddToSection}
+          onRemoveSection={this.onRemoveSection}
+        />
         <div style={{ display: isCollapsed ? 'none' : 'block' }}>
           {Object.keys(sectionPanels).length === 0 && this.props.renderEmpty?.(section.id)}
           <DashboardGrid
@@ -279,46 +236,11 @@ export class DashboardViewport extends React.Component<DashboardViewportProps, S
     );
   }
 
-  private onAddSection = () => {
-    // TODO: remove
-    const colorPalette = euiPaletteColorBlind();
-    this.props.container.updateInput({
-      sections: [
-        ...(this.state.sections ?? []),
-        {
-          id: uuid(),
-          initiallyCollapsed: false,
-          title: 'A new section',
-          color: colorPalette[Math.floor(Math.random() * colorPalette.length)],
-        },
-      ],
-    });
-  };
-
-  private renderWidgetBar() {
-    return (
-      <EuiButtonGroup
-        onChange={this.onAddSection}
-        isIconOnly={true}
-        options={[
-          {
-            id: 'dshWidget_addSection',
-            label: i18n.translate('dashboard.widgets.addSection', {
-              defaultMessage: 'Add Section',
-            }),
-            iconType: 'listAdd',
-          },
-        ]}
-      />
-    );
-  }
-
   public render() {
     const isCompletelyEmpty =
       !this.state.sections?.length && !Object.entries(this.state.panels).length;
     return (
       <React.Fragment>
-        {this.state.viewMode === ViewMode.EDIT && this.renderWidgetBar()}
         {isCompletelyEmpty ? this.renderEmptyScreen() : null}
         {!isCompletelyEmpty && this.renderContainerScreen()}
       </React.Fragment>

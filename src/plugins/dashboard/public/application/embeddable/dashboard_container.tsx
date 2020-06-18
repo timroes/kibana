@@ -24,6 +24,7 @@ import { RefreshInterval, TimeRange, Query, Filter } from 'src/plugins/data/publ
 import { CoreStart } from 'src/core/public';
 import { Start as InspectorStartContract } from 'src/plugins/inspector/public';
 import uuid from 'uuid';
+import { i18n } from '@kbn/i18n';
 import { getSavedObjectFinder } from '../../../../saved_objects/public';
 import { openAddPanelFlyout } from '../../../../embeddable/public';
 import { UiActionsStart } from '../../ui_actions_plugin';
@@ -49,7 +50,8 @@ import {
 import { PLACEHOLDER_EMBEDDABLE } from './placeholder';
 import { PanelPlacementMethod, IPanelPlacementArgs } from './panel/dashboard_panel_placement';
 import { DashboardSection } from '../../types';
-import { panelsInSection } from '../lib/section_utils';
+import { panelsInSection } from '../sections';
+import { DashboardToolbar } from './dashboard_toolbar';
 
 export interface DashboardContainerInput extends ContainerInput {
   viewMode: ViewMode;
@@ -67,7 +69,6 @@ export interface DashboardContainerInput extends ContainerInput {
     [panelId: string]: DashboardPanelState<EmbeddableInput & { [k: string]: unknown }>;
   };
   sections?: DashboardSection[];
-  isEmptyState?: boolean;
 }
 
 interface IndexSignature {
@@ -100,6 +101,10 @@ interface SectionIdMeta {
   sectionId: string;
 }
 
+/**
+ * Returns whether a given unknown parameter contains section id meta information,
+ * i.e. is an object with a sectionId key.
+ */
 function isSectionIdMeta(param: unknown): param is SectionIdMeta {
   return typeof param === 'object' && param !== null && 'sectionId' in param;
 }
@@ -201,7 +206,7 @@ export class DashboardContainer extends Container<InheritedChildInput, Dashboard
     });
   }
 
-  private addNewToSection = async (section: DashboardSection) => {
+  private addNewToSection = async (sectionId: string) => {
     openAddPanelFlyout({
       embeddable: this,
       getAllFactories: this.options.embeddable.getEmbeddableFactories,
@@ -213,15 +218,35 @@ export class DashboardContainer extends Container<InheritedChildInput, Dashboard
         this.options.core.uiSettings
       ),
       embeddableMetaInformation: {
-        sectionId: section.id,
+        sectionId,
       },
     });
+  };
+
+  private onAddSection = () => {
+    this.updateInput({
+      sections: [
+        ...(this.getInput().sections ?? []),
+        {
+          id: uuid(),
+          title: i18n.translate('dashboard.section.newSectionDefaultName', {
+            defaultMessage: 'Dashboard Section',
+          }),
+        },
+      ],
+    });
+    this.options.notifications.toasts.addSuccess(
+      i18n.translate('dashboard.section.newSectionSuccessToast', {
+        defaultMessage: 'New section was added to bottom of dashboard.',
+      })
+    );
   };
 
   public render(dom: HTMLElement) {
     ReactDOM.render(
       <I18nProvider>
         <KibanaContextProvider services={this.options}>
+          <DashboardToolbar onCreateSection={this.onAddSection} />
           <DashboardViewport
             renderEmpty={this.renderEmpty}
             container={this}

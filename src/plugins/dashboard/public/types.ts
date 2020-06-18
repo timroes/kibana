@@ -60,7 +60,6 @@ interface FieldSubType {
 export interface DashboardSection {
   id: string;
   title: string;
-  initiallyCollapsed: boolean;
   color?: string;
 }
 
